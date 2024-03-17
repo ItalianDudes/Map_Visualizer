@@ -30,6 +30,22 @@ public final class JFXDefs {
             public static final String FXML_LOADING = FXML_DIR + "SceneLoading.fxml";
             public static final String FXML_MAIN_MENU = FXML_DIR + "SceneMainMenu.fxml";
             public static final String FXML_SETTINGS_EDITOR = FXML_DIR + "SceneSettingsEditor.fxml";
+            public static final String FXML_MAP_SHEET = FXML_DIR + "SceneMapSheet.fxml";
+
+            // Sheet Tabs
+            public static final class Tabs {
+                private static final String TAB_DIR = FXML_DIR + "tabs/";
+                public static final String FXML_TAB_MAP = TAB_DIR + "SceneTabMap.fxml";
+            }
+
+            public static final class Elements {
+                private static final String FXML_ELEMENTS_DIR = FXML_DIR + "elements/";
+                public static final String FXML_ELEMENT_ITEM = FXML_ELEMENTS_DIR + "SceneElementItem.fxml";
+                public static final String FXML_ELEMENT_SPELL = FXML_ELEMENTS_DIR + "SceneElementSpell.fxml";
+                public static final String FXML_ELEMENT_ARMOR = FXML_ELEMENTS_DIR + "SceneElementArmor.fxml";
+                public static final String FXML_ELEMENT_WEAPON = FXML_ELEMENTS_DIR + "SceneElementWeapon.fxml";
+                public static final String FXML_ELEMENT_ADDON = FXML_ELEMENTS_DIR + "SceneElementAddon.fxml";
+            }
         }
 
         // GIF Location

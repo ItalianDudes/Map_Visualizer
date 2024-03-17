@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--suppress JavaFxDefaultTag -->
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.italiandudes.map_visualizer.client.javafx.controllers.elements.ControllerSceneElementArmor">
+   <content>
+      <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0">
+         <children>
+            <GridPane vgap="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints valignment="CENTER" vgrow="NEVER" />
+                <RowConstraints valignment="CENTER" vgrow="NEVER" />
+                  <RowConstraints valignment="CENTER" vgrow="NEVER" />
+                  <RowConstraints valignment="CENTER" vgrow="NEVER" />
+                  <RowConstraints valignment="CENTER" vgrow="NEVER" />
+              </rowConstraints>
+               <children>
+                  <TextField fx:id="textFieldName" alignment="CENTER" promptText="Nome Armatura">
+                     <font>
+                        <Font name="Lucida Sans Demibold" size="32.0" />
+                     </font>
+                  </TextField>
+                  <GridPane hgap="5.0" GridPane.rowIndex="1">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
+                      <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints valignment="CENTER" vgrow="NEVER" />
+                    </rowConstraints>
+                     <children>
+                        <GridPane vgap="5.0">
+                          <columnConstraints>
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints valignment="CENTER" vgrow="NEVER" />
+                            <RowConstraints valignment="CENTER" vgrow="ALWAYS" />
+                          </rowConstraints>
+                           <children>
+                              <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#removeImage">
+                                 <graphic>
+                                    <ImageView fitHeight="30.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../../image/delete.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
+                              <ImageView fx:id="imageViewItem" fitHeight="256.0" fitWidth="256.0" onMouseClicked="#openFileChooser" pickOnBounds="true" GridPane.rowIndex="1">
+                                 <viewport>
+                                    <Rectangle2D />
+                                 </viewport>
+                              </ImageView>
+                           </children>
+                        </GridPane>
+                        <GridPane vgap="5.0" GridPane.columnIndex="1">
+                          <columnConstraints>
+                            <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints valignment="CENTER" vgrow="NEVER" />
+                              <RowConstraints valignment="CENTER" vgrow="NEVER" />
+                            <RowConstraints valignment="CENTER" vgrow="ALWAYS" />
+                          </rowConstraints>
+                           <children>
+                              <ComboBox fx:id="comboBoxRarity" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="1000.0" promptText="Rarità" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-font-family: Lucida Sans;" />
+                              <GridPane hgap="5.0" vgap="5.0" GridPane.rowIndex="1">
+                                 <columnConstraints>
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints vgrow="SOMETIMES" />
+                                    <RowConstraints vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                                 <children>
+                                    <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../../image/sheet/equipment/weight.png" />
+                                       </image>
+                                    </ImageView>
+                                    <GridPane hgap="5.0" GridPane.columnIndex="1">
+                                       <columnConstraints>
+                                          <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" />
+                                          <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
+                                       </columnConstraints>
+                                       <rowConstraints>
+                                          <RowConstraints vgrow="SOMETIMES" />
+                                       </rowConstraints>
+                                       <children>
+                                          <TextField fx:id="textFieldWeight" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="512.0" promptText="Peso">
+                                             <font>
+                                                <Font name="Lucida Sans Regular" size="16.0" />
+                                             </font>
+                                          </TextField>
+                                          <ComboBox fx:id="comboBoxWeightCategory" maxWidth="1.7976931348623157E308" promptText="Categoria Peso" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-font-family: Lucida Sans;" GridPane.columnIndex="1">
+                                             <GridPane.margin>
+                                                <Insets />
+                                             </GridPane.margin>
+                                          </ComboBox>
+                                       </children>
+                                    </GridPane>
+                                    <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="1">
+                                       <image>
+                                          <Image url="@../../image/sheet/inventory/quantity.png" />
+                                       </image>
+                                    </ImageView>
+                                    <Spinner fx:id="spinnerQuantity" editable="true" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="900.0" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-font-family: Lucida Sans;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                 </children>
+                              </GridPane>
+                              <GridPane hgap="5.0" GridPane.rowIndex="2">
+                                <columnConstraints>
+                                    <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
+                                  <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints valignment="CENTER" vgrow="SOMETIMES" />
+                                  <RowConstraints valignment="CENTER" vgrow="SOMETIMES" />
+                                  <RowConstraints valignment="CENTER" vgrow="SOMETIMES" />
+                                    <RowConstraints valignment="CENTER" vgrow="SOMETIMES" />
+                                    <RowConstraints valignment="CENTER" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <ImageView fitHeight="30.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../../image/sheet/coins/copper-coin.png" />
+                                       </image>
+                                    </ImageView>
+                                    <TextField fx:id="textFieldMR" maxWidth="1.7976931348623157E308" promptText="Rame" text="0" GridPane.columnIndex="1">
+                                       <font>
+                                          <Font name="Lucida Sans Regular" size="16.0" />
+                                       </font>
+                                    </TextField>
+                                    <ImageView fitHeight="30.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="1">
+                                       <image>
+                                          <Image url="@../../image/sheet/coins/silver-coin.png" />
+                                       </image>
+                                    </ImageView>
+                                    <TextField fx:id="textFieldMA" maxWidth="1.7976931348623157E308" promptText="Argento" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                       <font>
+                                          <Font name="Lucida Sans Regular" size="16.0" />
+                                       </font>
+                                    </TextField>
+                                    <ImageView fitHeight="30.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="2">
+                                       <image>
+                                          <Image url="@../../image/sheet/coins/electrum-coin.png" />
+                                       </image>
+                                    </ImageView>
+                                    <TextField fx:id="textFieldME" maxWidth="1.7976931348623157E308" promptText="Electrum" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                       <font>
+                                          <Font name="Lucida Sans Regular" size="16.0" />
+                                       </font>
+                                    </TextField>
+                                    <ImageView fitHeight="30.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="3">
+                                       <image>
+                                          <Image url="@../../image/sheet/coins/gold-coin.png" />
+                                       </image>
+                                    </ImageView>
+                                    <TextField fx:id="textFieldMO" maxWidth="1.7976931348623157E308" promptText="Oro" text="0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                       <font>
+                                          <Font name="Lucida Sans Regular" size="16.0" />
+                                       </font>
+                                    </TextField>
+                                    <ImageView fitHeight="30.0" pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="4">
+                                       <image>
+                                          <Image url="@../../image/sheet/coins/platinum-coin.png" />
+                                       </image>
+                                    </ImageView>
+                                    <TextField fx:id="textFieldMP" maxWidth="1.7976931348623157E308" promptText="Platino" text="0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                       <font>
+                                          <Font name="Lucida Sans Regular" size="16.0" />
+                                       </font>
+                                    </TextField>
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </GridPane>
+                     </children>
+                  </GridPane>
+                  <GridPane vgap="5.0" GridPane.rowIndex="2">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints valignment="CENTER" vgrow="NEVER" />
+                        <RowConstraints valignment="CENTER" vgrow="NEVER" />
+                     </rowConstraints>
+                     <children>
+                        <GridPane hgap="5.0" vgap="5.0">
+                           <columnConstraints>
+                              <ColumnConstraints halignment="RIGHT" hgrow="NEVER" />
+                              <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
+                              <ColumnConstraints halignment="RIGHT" hgrow="NEVER" />
+                              <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints valignment="CENTER" vgrow="NEVER" />
+                              <RowConstraints valignment="CENTER" vgrow="NEVER" />
+                              <RowConstraints valignment="CENTER" vgrow="NEVER" />
+                           </rowConstraints>
+                           <children>
+                              <Label text="Effetto Vita" GridPane.rowIndex="1">
+                                 <font>
+                                    <Font name="Lucida Sans Demibold" size="16.0" />
+                                 </font>
+                              </Label>
+                              <TextField fx:id="textFieldEffectLife" promptText="Effetto Vita" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <font>
+                                    <Font name="Lucida Sans Regular" size="16.0" />
+                                 </font>
+                              </TextField>
+                              <Label text="Effetto Carico" GridPane.rowIndex="2">
+                                 <font>
+                                    <Font name="Lucida Sans Demibold" size="16.0" />
+                                 </font>
+                              </Label>
+                              <TextField fx:id="textFieldEffectLoad" promptText="Effetto Carico" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                 <font>
+                                    <Font name="Lucida Sans Regular" size="16.0" />
+                                 </font>
+                              </TextField>
+                              <Label text="Effetto Vita %" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                 <font>
+                                    <Font name="Lucida Sans Demibold" size="16.0" />
+                                 </font>
+                                 <GridPane.margin>
+                                    <Insets left="25.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <TextField fx:id="textFieldEffectLifePerc" promptText="Effetto Vita %" text="0.0" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                                 <font>
+                                    <Font name="Lucida Sans Regular" size="16.0" />
+                                 </font>
+                              </TextField>
+                              <Label text="Effetto Carico %" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                 <font>
+                                    <Font name="Lucida Sans Demibold" size="16.0" />
+                                 </font>
+                                 <GridPane.margin>
+                                    <Insets left="25.0" />
+                                 </GridPane.margin>
+                              </Label>
+                              <TextField fx:id="textFieldEffectLoadPerc" promptText="Effetto Carico %" text="0.0" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                                 <font>
+                                    <Font name="Lucida Sans Regular" size="16.0" />
+                                 </font>
+                              </TextField>
+                              <Label text="Slot Armatura">
+                                 <font>
+                                    <Font name="Lucida Sans Demibold" size="16.0" />
+                                 </font>
+                              </Label>
+                              <ComboBox fx:id="comboBoxSlot" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="500.0" promptText="Slot Armatura" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-font-family: Lucida Sans;" GridPane.columnIndex="1" />
+                              <Label text="Effetto CA" GridPane.columnIndex="2">
+                                 <font>
+                                    <Font name="Lucida Sans Demibold" size="16.0" />
+                                 </font>
+                              </Label>
+                              <TextField fx:id="textFieldEffectCA" promptText="Effetto CA" text="0" GridPane.columnIndex="3">
+                                 <font>
+                                    <Font name="Lucida Sans Regular" size="16.0" />
+                                 </font>
+                              </TextField>
+                           </children>
+                        </GridPane>
+                        <TextArea fx:id="textAreaOtherEffects" promptText="Altri Effetti" GridPane.rowIndex="1">
+                           <font>
+                              <Font name="Lucida Sans Regular" size="16.0" />
+                           </font>
+                        </TextArea>
+                     </children>
+                  </GridPane>
+                  <TextArea fx:id="textAreaDescription" promptText="Descrizione" wrapText="true" GridPane.rowIndex="3">
+                     <font>
+                        <Font name="Lucida Sans Regular" size="16.0" />
+                     </font>
+                  </TextArea>
+                  <GridPane hgap="10.0" GridPane.rowIndex="4">
+                     <columnConstraints>
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints valignment="CENTER" vgrow="NEVER" />
+                     </rowConstraints>
+                     <children>
+                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#backToSheet">
+                           <graphic>
+                              <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" rotate="-180.0">
+                                 <image>
+                                    <Image url="@../../image/arrow-right.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#exportArmorStructure" GridPane.columnIndex="1">
+                           <font>
+                              <Font name="Lucida Sans Demibold" size="16.0" />
+                           </font>
+                           <graphic>
+                              <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../image/export.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#save" GridPane.columnIndex="2">
+                           <graphic>
+                              <ImageView fitHeight="50.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../image/save.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                     </children>
+                  </GridPane>
+               </children>
+            </GridPane>
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </AnchorPane>
+   </content>
+</ScrollPane>

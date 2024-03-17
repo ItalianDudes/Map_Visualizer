@@ -17,6 +17,9 @@ public final class Defs {
     // Charset
     public static final String DEFAULT_CHARSET = "UTF-8";
 
+    // DB Versions
+    public static final String DB_VERSION = "1.0";
+
     // Jar App Position
     public static final String JAR_POSITION;
     static {
@@ -43,10 +46,20 @@ public final class Defs {
             return Objects.requireNonNull(Map_Visualizer.class.getResourceAsStream(resourceConst));
         }
 
+        // Element Extension
+        public static final String ELEMENT_EXTENSION = "dnd5e.element";
+
         // JSON
         public static final class JSON {
             public static final String JSON_SETTINGS = "settings.json";
             public static final String DEFAULT_JSON_SETTINGS = "/json/" + JSON_SETTINGS;
+        }
+
+        // SQL
+        public static final class SQL {
+            private static final String SQL_DIR = "/sql/";
+            public static final String SQL_MAP_DATA = SQL_DIR + "map_data.sql";
+            public static String[] SUPPORTED_IMAGE_EXTENSIONS = {"*.png", "*.jpg", "*.jpeg"};
         }
 
         // Images
