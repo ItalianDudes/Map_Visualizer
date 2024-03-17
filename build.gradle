@@ -1,0 +1,56 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'java'
+}
+
+// Versioning
+def versionNumber = '0.0.1'
+def versionType = 'DEV' // RELEASE | BETA | ALPHA | DEV
+def versionMarker = versionType.charAt(0)
+
+group = 'it.italiandudes'
+version = versionNumber+versionMarker
+
+repositories {
+    mavenCentral()
+    jcenter()
+    flatDir {
+        dirs 'lib'
+    }
+}
+
+dependencies {
+    compileOnly 'org.jetbrains:annotations:23.0.0'
+    implementation 'commons-io:commons-io:2.11.0'
+    implementation 'commons-codec:commons-codec:1.15'
+    implementation 'it.italiandudes:idl:1.0.5'
+    implementation 'org.json:json:20231013'
+}
+
+shadowJar {
+    manifest {
+        attributes "Main-Class" : "it.italiandudes.map_visualizer.Map_Visualizer"
+        attributes "Title" : "Map Visualizer"
+        attributes "Vendor" : "ItalianDudes"
+        attributes "Version" : archiveVersion.get()
+        attributes "Version-Number" : archiveVersion.get()
+        attributes "Version-Type" : versionType
+        attributes "Version-Marker" : versionMarker
+        attributes "Timestamp" : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+    }
+    archiveFileName = getRootDir().getName()+"-"+archiveVersion.get()+".jar"
+}
+
+tasks.register('buildJar') {
+    dependsOn shadowJar
+    group = "Build"
+    description = "Build and assemble Map_Visualizer"
+}
+
+tasks.register('runClient', Exec) {
+    dependsOn shadowJar
+    group = "Execution"
+    description = "Build, assemble and run Map_Visualizer"
+    standardInput = System.in
+    commandLine "java", "-jar", jar.archiveFile.get()
+}
