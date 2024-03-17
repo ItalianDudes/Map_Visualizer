@@ -1,9 +1,9 @@
 package it.italiandudes.map_visualizer.data.elements;
 
 import it.italiandudes.idl.common.Logger;
-import it.italiandudes.map_visualizer.client.interfaces.ISavable;
-import it.italiandudes.map_visualizer.client.javafx.alerts.ErrorAlert;
-import it.italiandudes.map_visualizer.client.utils.DBManager;
+import it.italiandudes.map_visualizer.master.interfaces.ISavable;
+import it.italiandudes.map_visualizer.master.javafx.alerts.ErrorAlert;
+import it.italiandudes.map_visualizer.master.utils.DBManager;
 import it.italiandudes.map_visualizer.data.enums.Category;
 import it.italiandudes.map_visualizer.data.enums.EquipmentType;
 import org.jetbrains.annotations.NotNull;

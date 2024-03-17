@@ -1,6 +1,6 @@
 package it.italiandudes.map_visualizer;
 
-import it.italiandudes.map_visualizer.client.javafx.Client;
+import it.italiandudes.map_visualizer.master.javafx.Client;
 import it.italiandudes.idl.common.InfoFlags;
 import it.italiandudes.idl.common.Logger;
 

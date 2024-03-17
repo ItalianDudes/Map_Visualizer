@@ -1,8 +1,8 @@
 package it.italiandudes.map_visualizer.data.elements;
 
-import it.italiandudes.map_visualizer.client.interfaces.ISavable;
-import it.italiandudes.map_visualizer.client.interfaces.ISerializable;
-import it.italiandudes.map_visualizer.client.utils.DBManager;
+import it.italiandudes.map_visualizer.master.interfaces.ISavable;
+import it.italiandudes.map_visualizer.master.interfaces.ISerializable;
+import it.italiandudes.map_visualizer.master.utils.DBManager;
 import it.italiandudes.map_visualizer.data.enums.Category;
 import it.italiandudes.map_visualizer.data.enums.Rarity;
 import it.italiandudes.map_visualizer.data.enums.SerializerType;

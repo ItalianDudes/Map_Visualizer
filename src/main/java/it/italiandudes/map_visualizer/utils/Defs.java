@@ -49,6 +49,9 @@ public final class Defs {
         // Element Extension
         public static final String ELEMENT_EXTENSION = "dnd5e.element";
 
+        // Map Extension
+        public static final String MAP_EXTENSION = "dnd5e.map";
+
         // JSON
         public static final class JSON {
             public static final String JSON_SETTINGS = "settings.json";
