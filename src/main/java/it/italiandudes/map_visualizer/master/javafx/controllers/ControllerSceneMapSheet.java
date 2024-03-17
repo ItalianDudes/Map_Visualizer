@@ -4,7 +4,6 @@ import it.italiandudes.map_visualizer.master.javafx.components.SceneController;
 import it.italiandudes.map_visualizer.master.javafx.controllers.tabs.ControllerSceneTabElements;
 import it.italiandudes.map_visualizer.master.javafx.controllers.tabs.ControllerSceneTabMap;
 import it.italiandudes.map_visualizer.master.javafx.controllers.tabs.ControllerSceneTabSettings;
-import it.italiandudes.map_visualizer.master.javafx.scenes.tabs.SceneTabElements;
 import it.italiandudes.map_visualizer.master.javafx.scenes.tabs.SceneTabMap;
 import it.italiandudes.map_visualizer.master.javafx.scenes.tabs.SceneTabSettings;
 import javafx.fxml.FXML;
@@ -27,13 +26,13 @@ public final class ControllerSceneMapSheet {
     @FXML
     private void initialize() {
         SceneController map = SceneTabMap.getScene();
-        SceneController elements = SceneTabElements.getScene();
+        // SceneController elements = SceneTabElements.getScene();
         SceneController settings = SceneTabSettings.getScene();
         controllerTabMap = (ControllerSceneTabMap) map.getController();
-        controllerTabElements = (ControllerSceneTabElements) elements.getController();
+        // controllerTabElements = (ControllerSceneTabElements) elements.getController();
         controllerTabSettings = (ControllerSceneTabSettings) settings.getController();
         tabMap.setContent(map.getParent());
-        tabElements.setContent(elements.getParent());
+        // tabElements.setContent(elements.getParent());
         tabSettings.setContent(settings.getParent());
     }
 

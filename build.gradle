@@ -13,7 +13,6 @@ version = versionNumber+versionMarker
 
 repositories {
     mavenCentral()
-    jcenter()
     flatDir {
         dirs 'lib'
     }
@@ -25,6 +24,8 @@ dependencies {
     implementation 'commons-codec:commons-codec:1.15'
     implementation 'it.italiandudes:idl:1.0.5'
     implementation 'org.json:json:20231013'
+    implementation 'org.xerial:sqlite-jdbc:3.45.2.0'
+    implementation 'org.slf4j:slf4j-nop:2.0.12'
 }
 
 shadowJar {
