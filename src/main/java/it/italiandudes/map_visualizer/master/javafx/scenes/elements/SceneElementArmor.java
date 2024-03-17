@@ -5,26 +5,27 @@ import it.italiandudes.map_visualizer.master.javafx.utils.JFXDefs;
 import it.italiandudes.map_visualizer.master.javafx.components.SceneController;
 import it.italiandudes.map_visualizer.master.javafx.controllers.elements.ControllerSceneElementArmor;
 import it.italiandudes.map_visualizer.master.javafx.utils.ThemeHandler;
-import it.italiandudes.map_visualizer.data.elements.Armor;
 import it.italiandudes.map_visualizer.utils.Defs;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public final class SceneElementArmor {
 
     // Scene Generator
     @NotNull
-    public static SceneController getScene(@NotNull final Armor armor) {
+    public static SceneController getScene(@Nullable final String armorName) throws SQLException {
         try {
             FXMLLoader loader = new FXMLLoader(Defs.Resources.get(JFXDefs.Resources.FXML.Elements.FXML_ELEMENT_ARMOR));
             Parent root = loader.load();
             ThemeHandler.loadConfigTheme(root);
             ControllerSceneElementArmor controller = loader.getController();
-            controller.setArmor(armor);
+            if (armorName != null) controller.setArmor(armorName);
             controller.configurationComplete();
             return new SceneController(root, controller);
         } catch (IOException e) {

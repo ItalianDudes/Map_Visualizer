@@ -5,26 +5,27 @@ import it.italiandudes.map_visualizer.master.javafx.utils.JFXDefs;
 import it.italiandudes.map_visualizer.master.javafx.components.SceneController;
 import it.italiandudes.map_visualizer.master.javafx.controllers.elements.ControllerSceneElementSpell;
 import it.italiandudes.map_visualizer.master.javafx.utils.ThemeHandler;
-import it.italiandudes.map_visualizer.data.elements.Spell;
 import it.italiandudes.map_visualizer.utils.Defs;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public final class SceneElementSpell {
 
     // Scene Generator
     @NotNull
-    public static SceneController getScene(@NotNull final Spell spell) {
+    public static SceneController getScene(@Nullable final String spellName) throws SQLException {
         try {
             FXMLLoader loader = new FXMLLoader(Defs.Resources.get(JFXDefs.Resources.FXML.Elements.FXML_ELEMENT_SPELL));
             Parent root = loader.load();
             ThemeHandler.loadConfigTheme(root);
             ControllerSceneElementSpell controller = loader.getController();
-            controller.setSpell(spell);
+            if (spellName != null) controller.setSpell(spellName);
             controller.configurationComplete();
             return new SceneController(root, controller);
         } catch (IOException e) {

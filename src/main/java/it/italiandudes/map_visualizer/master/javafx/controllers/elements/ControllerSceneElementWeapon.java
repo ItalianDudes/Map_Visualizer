@@ -39,6 +39,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Base64;
 
 public final class ControllerSceneElementWeapon {
@@ -50,8 +51,8 @@ public final class ControllerSceneElementWeapon {
     private String imageExtension = null;
 
     // Methods
-    public void setWeapon(@NotNull final Weapon weapon) {
-        this.weapon = weapon;
+    public void setWeapon(@NotNull final String weaponName) throws SQLException {
+        this.weapon = new Weapon(weaponName);
     }
     public void setWeaponStructure(@NotNull final JSONObject weaponStructure) {
         this.weaponStructure = weaponStructure;

@@ -86,13 +86,13 @@ public final class Client extends Application {
         return SYSTEM_CLIPBOARD;
     }
     @NotNull
-    public static Stage initPopupStage(Scene scene) {
+    public static Stage initPopupStage(@NotNull final Parent scene) {
         Stage popupStage = new Stage();
         popupStage.getIcons().add(JFXDefs.AppInfo.LOGO);
         popupStage.setTitle(JFXDefs.AppInfo.NAME);
         popupStage.initOwner(STAGE);
         popupStage.initModality(Modality.WINDOW_MODAL);
-        popupStage.setScene(scene);
+        popupStage.setScene(new Scene(scene));
         return popupStage;
     }
 }

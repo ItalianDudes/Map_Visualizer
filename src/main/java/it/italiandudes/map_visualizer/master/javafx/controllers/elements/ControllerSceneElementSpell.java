@@ -41,6 +41,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Base64;
 
 @SuppressWarnings("unused")
@@ -53,8 +54,8 @@ public final class ControllerSceneElementSpell {
     private String imageExtension = null;
 
     // Methods
-    public void setSpell(@NotNull final Spell spell) {
-        this.spell = spell;
+    public void setSpell(@NotNull final String spellName) throws SQLException {
+        this.spell = new Spell(spellName);
     }
     public void setSpellStructure(@NotNull final JSONObject spellStructure) {
         this.spellStructure = spellStructure;

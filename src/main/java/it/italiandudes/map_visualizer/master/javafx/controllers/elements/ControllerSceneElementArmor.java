@@ -41,6 +41,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Base64;
 
 public final class ControllerSceneElementArmor {
@@ -52,8 +53,8 @@ public final class ControllerSceneElementArmor {
     private String imageExtension = null;
 
     // Methods
-    public void setArmor(@NotNull final Armor armor) {
-        this.armor = armor;
+    public void setArmor(@NotNull final String armorName) throws SQLException {
+        this.armor = new Armor(armorName);
     }
     public void setArmorStructure(@NotNull final JSONObject armorStructure) {
         this.armorStructure = armorStructure;

@@ -38,6 +38,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Base64;
 
 public class ControllerSceneElementItem {
@@ -49,8 +50,8 @@ public class ControllerSceneElementItem {
     private String imageExtension = null;
 
     // Methods
-    public void setItem(@NotNull final Item item) {
-        this.item = item;
+    public void setItem(@NotNull final String itemName) throws SQLException {
+        this.item = new Item(itemName);
     }
     public void setItemStructure(@NotNull final JSONObject itemStructure) {
         this.itemStructure = itemStructure;

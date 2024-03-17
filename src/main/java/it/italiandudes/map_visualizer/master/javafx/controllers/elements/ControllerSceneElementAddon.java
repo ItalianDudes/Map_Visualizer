@@ -40,6 +40,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Base64;
 
 public final class ControllerSceneElementAddon {
@@ -51,8 +52,8 @@ public final class ControllerSceneElementAddon {
     private String imageExtension = null;
 
     // Methods
-    public void setAddon(@NotNull final Addon addon) {
-        this.addon = addon;
+    public void setAddon(@NotNull final String addonName) throws SQLException {
+        this.addon = new Addon(addonName);
     }
     public void setAddonStructure(@NotNull final JSONObject addonStructure) {
         this.addonStructure = addonStructure;
