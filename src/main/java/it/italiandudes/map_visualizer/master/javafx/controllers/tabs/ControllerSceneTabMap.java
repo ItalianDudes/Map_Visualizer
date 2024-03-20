@@ -1,16 +1,25 @@
 package it.italiandudes.map_visualizer.master.javafx.controllers.tabs;
 
+import it.italiandudes.idl.common.Logger;
 import it.italiandudes.map_visualizer.master.javafx.Client;
+import it.italiandudes.map_visualizer.master.javafx.alerts.ErrorAlert;
+import it.italiandudes.map_visualizer.master.javafx.components.TextFieldMenuItem;
+import it.italiandudes.map_visualizer.master.javafx.components.waypoints.Waypoint;
+import it.italiandudes.map_visualizer.master.javafx.scenes.elements.*;
+import it.italiandudes.map_visualizer.utils.Defs;
 import javafx.animation.AnimationTimer;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
+import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import org.jetbrains.annotations.NotNull;
+
+import java.sql.SQLException;
 
 public final class ControllerSceneTabMap {
 
@@ -31,8 +40,8 @@ public final class ControllerSceneTabMap {
     // Graphic Elements
     @FXML private AnchorPane anchorPaneMapContainer;
     @FXML private ImageView imageViewMap;
-    @FXML private AnchorPane anchorPaneWaypointLayer;
     @FXML private Label labelWaypointName;
+    @FXML private AnchorPane anchorPaneWaypointLayer;
     private final AnimationTimer timer = new AnimationTimer() {
         @Override
         public void handle(long now) {
@@ -95,19 +104,91 @@ public final class ControllerSceneTabMap {
     }
     public void mapContextMenu(@NotNull final ContextMenuEvent e) {
         ContextMenu contextMenu = new ContextMenu();
-        Menu addWaypointMenu = new Menu("Aggiungi Waypoint");
-        TextField nameField = new TextField();
-        nameField.setPromptText("Nome");
-        MenuItem addWaypointOption = new MenuItem();
-        addWaypointOption.setGraphic(nameField);
-        addWaypointOption.setOnAction(event -> {
-            // addWaypoint(nameField.getText(), e.getScreenX(), e.getScreenY());
-            nameField.clear();
+        Point2D pos = anchorPaneWaypointLayer.screenToLocal(e.getScreenX(), e.getScreenY());
+
+        // Elements
+        Menu elementMenu = new Menu("Aggiungi Elemento");
+        MenuItem addItem = new MenuItem("Nuovo Oggetto");
+        addItem.setOnAction(ev -> {
+            try {
+                Client.initPopupStage(SceneElementItem.getScene((String) null).getParent()).showAndWait();
+            } catch (SQLException ex) {
+                Logger.log(ex);
+                new ErrorAlert("ERRORE", "Errore di Database", "Si e' verificato un'errore durante la comunicazione con il database");
+            }
         });
-        addWaypointMenu.getItems().add(addWaypointOption);
+        Menu equipmentMenu = new Menu("Nuovo Equipaggiamento");
+        MenuItem addArmor = new MenuItem("Nuova Armatura");
+        addArmor.setOnAction(ev -> {
+            try {
+                Client.initPopupStage(SceneElementArmor.getScene((String) null).getParent()).showAndWait();
+            } catch (SQLException ex) {
+                Logger.log(ex);
+                new ErrorAlert("ERRORE", "Errore di Database", "Si e' verificato un'errore durante la comunicazione con il database");
+            }
+        });
+        MenuItem addAddon = new MenuItem("Nuovo Addon");
+        addAddon.setOnAction(ev -> {
+            try {
+                Client.initPopupStage(SceneElementAddon.getScene((String) null).getParent()).showAndWait();
+            } catch (SQLException ex) {
+                Logger.log(ex);
+                new ErrorAlert("ERRORE", "Errore di Database", "Si e' verificato un'errore durante la comunicazione con il database");
+            }
+        });
+        MenuItem addWeapon = new MenuItem("Nuova Arma");
+        addWeapon.setOnAction(ev -> {
+            /*
+            try {
+                Client.initPopupStage(SceneElementWeapon.getScene((String) null).getParent()).showAndWait();
+            } catch (SQLException ex) {
+                Logger.log(ex);
+                new ErrorAlert("ERRORE", "Errore di Database", "Si e' verificato un'errore durante la comunicazione con il database");
+            }*/
+            Waypoint waypoint = new Waypoint("Test", Defs.Resources.SVG.SVG_WEAPON, pos);
+            anchorPaneWaypointLayer.getChildren().add(waypoint);
+            configureWaypointContenxtMenu(waypoint);
+        });
+        equipmentMenu.getItems().addAll(addArmor, addAddon, addWeapon);
+        MenuItem addSpell = new MenuItem("Nuovo Incantesimo");
+        addSpell.setOnAction(ev -> {
+            try {
+                Client.initPopupStage(SceneElementSpell.getScene((String) null).getParent()).showAndWait();
+            } catch (SQLException ex) {
+                Logger.log(ex);
+                new ErrorAlert("ERRORE", "Errore di Database", "Si e' verificato un'errore durante la comunicazione con il database");
+            }
+        });
+        elementMenu.getItems().addAll(addItem, equipmentMenu, addSpell);
+
+        // Entities
+        Menu entityMenu = new Menu("Aggiungi Entita'");
+        MenuItem addPlayer = new TextFieldMenuItem("Nuovo Giocatore", "Nome Giocatore");
+        MenuItem addNPC = new MenuItem("Nuovo NPC");
+        MenuItem addEnemy = new MenuItem("Nuovo Nemico");
+        Menu armyMenu = new Menu("Nuovo Esercito");
+        MenuItem addAllyArmy = new MenuItem("Nuovo Esercito Alleato");
+        MenuItem addEnemyArmy = new MenuItem("Nuovo Esercito Nemico");
+        armyMenu.getItems().addAll(addAllyArmy, addEnemyArmy);
+        entityMenu.getItems().addAll(addPlayer, addNPC, addEnemy, armyMenu);
+
+        // Objectives
+        Menu objectiveMenu = new Menu("Aggiungi Obiettivo");
+        MenuItem addMainMission = new TextFieldMenuItem("Nuova Missione Principale", "Nome Missione");
+        MenuItem addSecondaryMission = new TextFieldMenuItem("Nuova Missione Secondaria", "Nome Missione");
+        MenuItem addNPCInteraction = new TextFieldMenuItem("Nuova Interazione NPC", "Nome NPC");
+        objectiveMenu.getItems().addAll(addMainMission, addSecondaryMission, addNPCInteraction);
+
+        // Points of Interest
+        Menu pointsOfInterestMenu = new Menu("Aggiungi Punto di Interesse");
+        MenuItem addShop = new TextFieldMenuItem("Nuovo Negozio", "Nome Negozio");
+        MenuItem addTavern = new TextFieldMenuItem("Nuova Taverna", "Nome Taverna");
+        MenuItem addOffice = new TextFieldMenuItem("Nuovo Ufficio", "Nome Ufficio");
+        pointsOfInterestMenu.getItems().addAll(addShop, addTavern, addOffice);
+
         MenuItem resetMap = new MenuItem("Reimposta Mappa");
         resetMap.setOnAction(ev -> resetMapPositionAndScale());
-        contextMenu.getItems().addAll(addWaypointMenu, resetMap);
+        contextMenu.getItems().addAll(elementMenu, entityMenu, objectiveMenu, pointsOfInterestMenu, resetMap);
         contextMenu.setAutoHide(true);
         contextMenu.show(Client.getStage(), e.getScreenX(), e.getScreenY());
     }
@@ -149,6 +230,24 @@ public final class ControllerSceneTabMap {
         scaledWidth = imageViewMap.getFitWidth() * imageViewMap.getScaleX();
         scaledHeight = imageViewMap.getFitHeight() * imageViewMap.getScaleY();
         mapAtBorders();
+    }
+
+    // Waypoint Methods
+    private void configureWaypointContenxtMenu(@NotNull Waypoint waypoint) {
+        waypoint.hoverProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                waypoint.setScaleX(2);
+                waypoint.setScaleY(2);
+                labelWaypointName.setText(waypoint.getName());
+                labelWaypointName.setVisible(true);
+            } else {
+                waypoint.setScaleX(1);
+                waypoint.setScaleY(1);
+                labelWaypointName.setText("");
+                labelWaypointName.setVisible(false);
+            }
+        });
+        waypoint.setOnScroll(ControllerSceneTabMap.this::mapZoom);
     }
 
     // Methods

@@ -65,6 +65,16 @@ public final class Defs {
             public static String[] SUPPORTED_IMAGE_EXTENSIONS = {"*.png", "*.jpg", "*.jpeg"};
         }
 
+        // SVG
+        public static final class SVG {
+            private static final String SVG_DIR = "/svg/";
+            public static final String SVG_ADDON = SVG_DIR + "addon.svg";
+            public static final String SVG_ARMOR = SVG_DIR + "armor.svg";
+            public static final String SVG_ITEM = SVG_DIR + "item.svg";
+            public static final String SVG_SPELL = SVG_DIR + "spell.svg";
+            public static final String SVG_WEAPON = SVG_DIR + "weapon.svg";
+        }
+
         // Images
         public static final class Image {
             private static final String IMAGE_DIR = "/image/";
