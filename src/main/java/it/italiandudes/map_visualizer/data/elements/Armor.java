@@ -1,12 +1,12 @@
 package it.italiandudes.map_visualizer.data.elements;
 
 import it.italiandudes.map_visualizer.master.interfaces.ISavable;
+import it.italiandudes.map_visualizer.master.javafx.components.Waypoint;
 import it.italiandudes.map_visualizer.master.utils.DBManager;
 import it.italiandudes.map_visualizer.data.enums.*;
 import it.italiandudes.map_visualizer.utils.Defs;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
@@ -24,8 +24,8 @@ public final class Armor extends Equipment implements ISavable {
     @NotNull private ArmorWeightCategory weightCategory;
 
     // Constructors
-    public Armor(@NotNull final ArmorSlot slot) {
-        super(EquipmentType.ARMOR);
+    public Armor(@NotNull final ArmorSlot slot, @NotNull final Waypoint waypoint) {
+        super(EquipmentType.ARMOR, waypoint);
         this.slot = slot;
         this.weightCategory = ArmorWeightCategory.LIGHT;
     }
@@ -61,19 +61,6 @@ public final class Armor extends Equipment implements ISavable {
         } else {
             ps.close();
             throw new SQLException("Exist the equipment, but not the armor");
-        }
-    }
-    public Armor(@NotNull final JSONObject armorStructure) throws JSONException {
-        super(armorStructure);
-        try {
-            this.slot = ArmorSlot.values()[armorStructure.getInt("slot")+1];
-        } catch (ArrayIndexOutOfBoundsException | JSONException e) {
-            throw new JSONException("Parameter armor slot must be a non-null integer in bounds.");
-        }
-        try {
-            this.weightCategory = ArmorWeightCategory.values()[armorStructure.getInt("weightCategory")];
-        } catch (ArrayIndexOutOfBoundsException | JSONException e) {
-            this.weightCategory = ArmorWeightCategory.LIGHT;
         }
     }
 

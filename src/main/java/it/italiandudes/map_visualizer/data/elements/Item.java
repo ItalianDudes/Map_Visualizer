@@ -2,6 +2,7 @@ package it.italiandudes.map_visualizer.data.elements;
 
 import it.italiandudes.map_visualizer.master.interfaces.ISavable;
 import it.italiandudes.map_visualizer.master.interfaces.ISerializable;
+import it.italiandudes.map_visualizer.master.javafx.components.Waypoint;
 import it.italiandudes.map_visualizer.master.utils.DBManager;
 import it.italiandudes.map_visualizer.data.enums.Category;
 import it.italiandudes.map_visualizer.data.enums.Rarity;
@@ -11,7 +12,6 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.imageio.ImageIO;
@@ -22,9 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Base64;
-import java.util.Objects;
 
-@SuppressWarnings("unused")
 public class Item implements ISavable, ISerializable {
 
     // Attributes
@@ -38,15 +36,17 @@ public class Item implements ISavable, ISerializable {
     private double weight;
     @NotNull private Category category;
     private int quantity;
+    @NotNull private final Waypoint waypoint;
 
     // Constructors
-    public Item(@NotNull final Category category) {
+    public Item(@NotNull final Category category, @NotNull final Waypoint waypoint) {
         name = "";
         rarity = Rarity.COMMON;
         costCopper = 0;
         weight = 0;
         this.category = category;
         quantity = 0;
+        this.waypoint = waypoint;
     }
     public Item(@NotNull final Item item) {
         this.itemID = item.itemID;
@@ -59,10 +59,11 @@ public class Item implements ISavable, ISerializable {
         this.weight = item.weight;
         this.category = item.category;
         this.quantity = item.quantity;
+        this.waypoint = item.waypoint;
     }
     public Item(@Nullable final Integer itemID, @Nullable final String base64image, @Nullable final String imageExtension,
                 @NotNull final String name, final int costCopper, @Nullable final String description, @Nullable final Rarity rarity,
-                final double weight, @Nullable final Category category, final int quantity) {
+                final double weight, @Nullable final Category category, final int quantity, @NotNull final Waypoint waypoint) {
         this.itemID = itemID;
         this.base64image = base64image;
         this.imageExtension = imageExtension;
@@ -75,11 +76,12 @@ public class Item implements ISavable, ISerializable {
         if (category == null) this.category = Category.values()[0];
         else this.category = category;
         this.quantity = Math.max(0, quantity);
+        this.waypoint = waypoint;
     }
     public Item(@Nullable final Integer itemID, @Nullable final Image image, @Nullable final String imageExtension,
                 @NotNull final String name, int cc, int cs, int ce, int cg, int cp,
                 @Nullable final String description, @Nullable final String rarity, @Nullable final Category category,
-                final double weight, final int quantity) {
+                final double weight, final int quantity, @NotNull final Waypoint waypoint) {
         this.itemID = itemID;
         this.name = name;
         if (cc < 0) cc = 0;
@@ -110,6 +112,7 @@ public class Item implements ISavable, ISerializable {
         if (weight < 0) this.weight = 0;
         else this.weight = weight;
         this.quantity = Math.max(0, quantity);
+        this.waypoint = waypoint;
     }
     public Item(@NotNull final String name) throws SQLException {
         String query = "SELECT * FROM items WHERE name = ?;";
@@ -128,6 +131,7 @@ public class Item implements ISavable, ISerializable {
         this.weight = Math.max(0, retrievedItem.weight);
         this.category = retrievedItem.category;
         this.quantity = retrievedItem.quantity;
+        this.waypoint = retrievedItem.waypoint;
     }
     public Item(int itemID) throws SQLException {
         String query = "SELECT * FROM items WHERE id=?;";
@@ -146,6 +150,7 @@ public class Item implements ISavable, ISerializable {
         this.weight = Math.max(0, retrievedItem.weight);
         this.category = retrievedItem.category;
         this.quantity = retrievedItem.quantity;
+        this.waypoint = retrievedItem.waypoint;
     }
     private Item(@NotNull final ResultSet resultSet) throws SQLException {
         this.itemID = resultSet.getInt("id");
@@ -174,46 +179,7 @@ public class Item implements ISavable, ISerializable {
         this.category = Category.values()[resultSet.getInt("category")];
         this.quantity = resultSet.getInt("quantity");
         if (this.quantity < 0) this.quantity = 0;
-    }
-    public Item(@NotNull final JSONObject itemStructure) throws JSONException {
-        try {
-            this.base64image = itemStructure.getString("base64image");
-            this.imageExtension = itemStructure.getString("imageExtension");
-        } catch (JSONException e) {
-            this.base64image = null;
-            this.imageExtension = null;
-        }
-        this.name = itemStructure.getString("name");
-        try {
-            this.costCopper = Math.max(0, itemStructure.getInt("costCopper"));
-        } catch (JSONException e) {
-            this.costCopper = 0;
-        }
-        try {
-            this.description = itemStructure.getString("description");
-        } catch (JSONException e) {
-            this.description = null;
-        }
-        try {
-            this.rarity = Rarity.values()[itemStructure.getInt("rarity")];
-        } catch (JSONException | ArrayIndexOutOfBoundsException e) {
-            this.rarity = Rarity.COMMON;
-        }
-        try {
-            this.weight = Math.max(0, itemStructure.getDouble("weight"));
-        } catch (JSONException e) {
-            this.weight = 0;
-        }
-        try {
-            this.category = Category.values()[itemStructure.getInt("category")];
-        } catch (ArrayIndexOutOfBoundsException | JSONException e) {
-            throw new JSONException("Parameter category must be a non-null integer in bounds.");
-        }
-        try {
-            this.quantity = Math.max(0, itemStructure.getInt("quantity"));
-        } catch (JSONException e) {
-            this.quantity = 0;
-        }
+        this.waypoint = new Waypoint(resultSet.getInt("waypoint_id"));
     }
 
     // Methods
@@ -263,6 +229,7 @@ public class Item implements ISavable, ISerializable {
         String query;
         int itemID;
         if (result.next()) { // Update
+            waypoint.saveIntoDatabase(oldName);
             itemID = result.getInt("id");
             ps.close();
             query = "UPDATE items SET name=?, base64image=?, image_extension=?, cost_copper=?, description=?, rarity=?, weight=?, category=?, quantity=? WHERE id=?;";
@@ -281,8 +248,10 @@ public class Item implements ISavable, ISerializable {
             ps.executeUpdate();
             ps.close();
         } else { // Insert
+            waypoint.saveIntoDatabase(null);
+            assert waypoint.getWaypointID() != null;
             ps.close();
-            query = "INSERT INTO items (name, base64image, image_extension, cost_copper, description, rarity, weight, category, quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+            query = "INSERT INTO items (name, base64image, image_extension, cost_copper, description, rarity, weight, category, quantity, waypoint_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
             ps = DBManager.preparedStatement(query);
             if (ps == null) throw new SQLException("The database connection doesn't exist");
             ps.setString(1, getName());
@@ -294,6 +263,7 @@ public class Item implements ISavable, ISerializable {
             ps.setDouble(7, getWeight());
             ps.setInt(8, getCategory().getDatabaseValue());
             ps.setInt(9, getQuantity());
+            ps.setInt(10, waypoint.getWaypointID());
             ps.executeUpdate();
             ps.close();
             query = "SELECT id FROM items WHERE name=?;";
@@ -378,16 +348,49 @@ public class Item implements ISavable, ISerializable {
     public void setQuantity(final int quantity) {
         this.quantity = Math.max(0, quantity);
     }
+    @NotNull
+    public Waypoint getWaypoint() {
+        return waypoint;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Item)) return false;
+
         Item item = (Item) o;
-        return getCostCopper() == item.getCostCopper() && Double.compare(getWeight(), item.getWeight()) == 0 && getQuantity() == item.getQuantity() && Objects.equals(getItemID(), item.getItemID()) && Objects.equals(getBase64image(), item.getBase64image()) && Objects.equals(getImageExtension(), item.getImageExtension()) && Objects.equals(getName(), item.getName()) && Objects.equals(getDescription(), item.getDescription()) && getRarity() == item.getRarity() && getCategory() == item.getCategory();
+
+        if (getCostCopper() != item.getCostCopper()) return false;
+        if (Double.compare(getWeight(), item.getWeight()) != 0) return false;
+        if (getQuantity() != item.getQuantity()) return false;
+        if (getItemID() != null ? !getItemID().equals(item.getItemID()) : item.getItemID() != null) return false;
+        if (getBase64image() != null ? !getBase64image().equals(item.getBase64image()) : item.getBase64image() != null)
+            return false;
+        if (getImageExtension() != null ? !getImageExtension().equals(item.getImageExtension()) : item.getImageExtension() != null)
+            return false;
+        if (!getName().equals(item.getName())) return false;
+        if (getDescription() != null ? !getDescription().equals(item.getDescription()) : item.getDescription() != null)
+            return false;
+        if (getRarity() != item.getRarity()) return false;
+        if (getCategory() != item.getCategory()) return false;
+        return getWaypoint().equals(item.getWaypoint());
     }
     @Override
     public int hashCode() {
-        return Objects.hash(getItemID(), getBase64image(), getImageExtension(), getName(), getCostCopper(), getDescription(), getRarity(), getWeight(), getCategory(), getQuantity());
+        int result;
+        long temp;
+        result = getItemID() != null ? getItemID().hashCode() : 0;
+        result = 31 * result + (getBase64image() != null ? getBase64image().hashCode() : 0);
+        result = 31 * result + (getImageExtension() != null ? getImageExtension().hashCode() : 0);
+        result = 31 * result + getName().hashCode();
+        result = 31 * result + getCostCopper();
+        result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
+        result = 31 * result + getRarity().hashCode();
+        temp = Double.doubleToLongBits(getWeight());
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + getCategory().hashCode();
+        result = 31 * result + getQuantity();
+        result = 31 * result + getWaypoint().hashCode();
+        return result;
     }
     @Override
     public String toString() {

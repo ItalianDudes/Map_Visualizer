@@ -2,6 +2,7 @@ package it.italiandudes.map_visualizer.data.elements;
 
 import it.italiandudes.map_visualizer.master.interfaces.ISavable;
 import it.italiandudes.map_visualizer.master.interfaces.ISerializable;
+import it.italiandudes.map_visualizer.master.javafx.components.Waypoint;
 import it.italiandudes.map_visualizer.master.utils.DBManager;
 import it.italiandudes.map_visualizer.data.enums.AddonSlot;
 import it.italiandudes.map_visualizer.data.enums.EquipmentType;
@@ -10,7 +11,6 @@ import it.italiandudes.map_visualizer.data.enums.SerializerType;
 import it.italiandudes.map_visualizer.utils.Defs;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
@@ -26,8 +26,8 @@ public class Addon extends Equipment implements ISavable, ISerializable {
     @Nullable private Integer addonID;
     @NotNull private AddonSlot slot;
 
-    public Addon(@NotNull final AddonSlot slot) {
-        super(EquipmentType.ADDON);
+    public Addon(@NotNull final AddonSlot slot, @NotNull final Waypoint waypoint) {
+        super(EquipmentType.ADDON, waypoint);
         this.slot = slot;
     }
     public Addon(@NotNull final Item item, final int equipmentID, final int addonID, @NotNull final AddonSlot slot,
@@ -59,14 +59,6 @@ public class Addon extends Equipment implements ISavable, ISerializable {
         } else {
             ps.close();
             throw new SQLException("Exist the equipment, but not the addon");
-        }
-    }
-    public Addon(@NotNull final JSONObject addonStructure) throws JSONException {
-        super(addonStructure);
-        try {
-            this.slot = AddonSlot.values()[addonStructure.getInt("slot")+1];
-        } catch (ArrayIndexOutOfBoundsException | JSONException e) {
-            throw new JSONException("Parameter addon slot must be a non-null integer in bounds.");
         }
     }
 

@@ -76,7 +76,7 @@ public final class DBManager {
     }
 
     // Default DB Error Message
-    public static void showDatabaseErrorMessage(@NotNull final Throwable t) {
+    public static void showDatabaseErrorMessageAndBackToMenu(@NotNull final Throwable t) {
         Logger.log(t);
         Platform.runLater(() -> {
             new ErrorAlert("ERRORE", "Errore di Database", "Si e' verificato un errore durante la comunicazione con il database, ritorno al menu principale.");

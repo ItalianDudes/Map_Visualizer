@@ -9,6 +9,8 @@ import it.italiandudes.map_visualizer.data.enums.Rarity;
 import it.italiandudes.map_visualizer.master.javafx.Client;
 import it.italiandudes.map_visualizer.master.javafx.alerts.ErrorAlert;
 import it.italiandudes.map_visualizer.master.javafx.components.SceneController;
+import it.italiandudes.map_visualizer.master.javafx.components.Waypoint;
+import it.italiandudes.map_visualizer.master.javafx.controllers.ControllerSceneMapSheet;
 import it.italiandudes.map_visualizer.master.javafx.scenes.SceneMainMenu;
 import it.italiandudes.map_visualizer.master.javafx.scenes.elements.*;
 import it.italiandudes.map_visualizer.master.utils.DBManager;
@@ -30,9 +32,23 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("DuplicatedCode")
 public final class ControllerSceneTabElements {
+
+    // Attributes
+    private ControllerSceneMapSheet controllerSceneMapSheet;
+    private volatile boolean configurationComplete = false;
+
+    // Methods
+    public void setControllerSceneMapSheet(@NotNull final ControllerSceneMapSheet controllerSceneMapSheet) {
+        this.controllerSceneMapSheet = controllerSceneMapSheet;
+    }
+    public void configurationComplete() {
+        configurationComplete = true;
+    }
 
     // Graphic Elements
     @FXML private TextField textFieldSearchBar;
@@ -58,12 +74,25 @@ public final class ControllerSceneTabElements {
         tableColumnInventoryQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         comboBoxCategory.setItems(FXCollections.observableList(Category.categories));
         comboBoxEquipmentType.setItems(FXCollections.observableList(EquipmentType.types));
-        search();
+        new Service<Void>() {
+            @Override
+            protected Task<Void> createTask() {
+                return new Task<Void>() {
+                    @Override
+                    protected Void call() {
+                        //noinspection StatementWithEmptyBody
+                        while (!configurationComplete);
+                        search();
+                        return null;
+                    }
+                };
+            }
+        }.start();
     }
 
     // EDT
     @FXML
-    private void search() {
+    public void search() {
         Category selectedCategory = comboBoxCategory.getSelectionModel().getSelectedItem();
         comboBoxEquipmentType.setDisable(selectedCategory == null || !selectedCategory.equals(Category.EQUIPMENT));
         EquipmentType equipmentType = comboBoxEquipmentType.getSelectionModel().getSelectedItem();
@@ -141,33 +170,6 @@ public final class ControllerSceneTabElements {
         comboBoxEquipmentType.setDisable(true);
         search();
     }
-    @FXML
-    private void deleteElement() {
-        Item element = tableViewInventory.getSelectionModel().getSelectedItem();
-        if (element == null || element.getItemID() == null) return;
-        new Service<Void>() {
-            @Override
-            protected Task<Void> createTask() {
-                return new Task<Void>() {
-                    @Override
-                    protected Void call() {
-                        try {
-                            PreparedStatement ps = DBManager.preparedStatement("DELETE FROM items WHERE id=?;");
-                            if (ps == null) throw new SQLException("The database connection doesn't exist");
-                            ps.setInt(1, element.getItemID());
-                            ps.executeUpdate();
-                            ps.close();
-                            Platform.runLater(ControllerSceneTabElements.this::search);
-                        } catch (SQLException e) {
-                            Logger.log(e);
-                            Platform.runLater(() -> new ErrorAlert("ERRORE", "Errore di Rimozione", "Si e' verificato un errore durante la rimozione dell'elemento."));
-                        }
-                        return null;
-                    }
-                };
-            }
-        }.start();
-    }
     @Nullable
     private SceneController selectEquipmentScene(@Nullable final Item element) throws SQLException {
         EquipmentType equipmentType;
@@ -226,6 +228,14 @@ public final class ControllerSceneTabElements {
         Stage popupStage = Client.initPopupStage(scene.getParent());
         popupStage.showAndWait();
         search();
+        controllerSceneMapSheet.getControllerTabMap().fetchWaypointsFromDB();
+    }
+    public void editElement(@NotNull final Waypoint waypoint) {
+        List<Item> matches = tableViewInventory.getItems().stream().filter(e -> waypoint.getName().equals(e.getName())).collect(Collectors.toList());
+        if (matches.size() != 1) return;
+        Item item = matches.get(0);
+        tableViewInventory.getSelectionModel().select(item);
+        editElement();
     }
     @FXML
     private void detectEnterOnRow(@NotNull final KeyEvent event) {
@@ -234,37 +244,5 @@ public final class ControllerSceneTabElements {
     @FXML
     private void doubleClickEdit(@NotNull final MouseEvent event) {
         if (event.getClickCount() >= 2) editElement();
-    }
-    @FXML
-    private void addElement() {
-        SceneController scene;
-        if (comboBoxCategory.getSelectionModel().isEmpty()) {
-            new ErrorAlert("ERRORE", "ERRORE DI PROCEDURA", "Per aggiungere un elemento e' necessario prima selezionare una categoria.");
-            return;
-        }
-        Category category = comboBoxCategory.getSelectionModel().getSelectedItem();
-        try {
-            switch (category) {
-                case ITEM:
-                    scene = SceneElementItem.getScene((String) null);
-                    break;
-                case EQUIPMENT:
-                    scene = selectEquipmentScene(null);
-                    break;
-                case SPELL:
-                    scene = SceneElementSpell.getScene((String) null);
-                    break;
-                default: // Invalid
-                    new ErrorAlert("ERRORE", "ERRORE NEL DATABASE", "L'elemento selezionato non possiede una categoria valida o non e' stata ancora implementata nell'applicazione.");
-                    return;
-            }
-        } catch (SQLException e) {
-            new ErrorAlert("ERRORE", "ERRORE NEL DATABASE", "L'elemento cercato non e' presente o il database e' danneggiato.");
-            return;
-        }
-        if (scene == null) return;
-        Stage popupStage = Client.initPopupStage(scene.getParent());
-        popupStage.showAndWait();
-        search();
     }
 }

@@ -1,6 +1,7 @@
 package it.italiandudes.map_visualizer.data.elements;
 
 import it.italiandudes.map_visualizer.master.interfaces.ISavable;
+import it.italiandudes.map_visualizer.master.javafx.components.Waypoint;
 import it.italiandudes.map_visualizer.master.utils.DBManager;
 import it.italiandudes.map_visualizer.data.enums.Category;
 import it.italiandudes.map_visualizer.data.enums.Rarity;
@@ -8,7 +9,6 @@ import it.italiandudes.map_visualizer.data.enums.SerializerType;
 import it.italiandudes.map_visualizer.utils.Defs;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
@@ -31,8 +31,8 @@ public final class Spell extends Item implements ISavable {
     @Nullable private String duration;
 
     // Constructors
-    public Spell() {
-        super(Category.SPELL);
+    public Spell(@NotNull final Waypoint waypoint) {
+        super(Category.SPELL, waypoint);
         level = 0;
     }
     public Spell(@NotNull final Item baseItem, @Nullable final Integer spellID,
@@ -104,39 +104,6 @@ public final class Spell extends Item implements ISavable {
         try {
             this.duration = resultSet.getString("duration");
         } catch (SQLException e) {
-            this.duration = null;
-        }
-    }
-    public Spell(@NotNull final JSONObject spellStructure) throws JSONException {
-        super(spellStructure);
-        try {
-            this.level = spellStructure.getInt("level");
-        } catch (JSONException e) {
-            this.level = 0;
-        }
-        try {
-            this.type = spellStructure.getString("type");
-        } catch (JSONException e) {
-            this.type = null;
-        }
-        try {
-            this.castTime = spellStructure.getString("castTime");
-        } catch (JSONException e) {
-            this.castTime = null;
-        }
-        try {
-            this.range = spellStructure.getString("range");
-        } catch (JSONException e) {
-            this.range = null;
-        }
-        try {
-            this.components = spellStructure.getString("components");
-        } catch (JSONException e) {
-            this.components = null;
-        }
-        try {
-            this.duration = spellStructure.getString("duration");
-        } catch (JSONException e) {
             this.duration = null;
         }
     }

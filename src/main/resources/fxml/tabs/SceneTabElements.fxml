@@ -37,8 +37,6 @@
                   <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
                   <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
                   <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
-                  <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
-                  <ColumnConstraints halignment="CENTER" hgrow="NEVER" />
                </columnConstraints>
                <rowConstraints>
                   <RowConstraints valignment="CENTER" vgrow="NEVER" />
@@ -73,35 +71,11 @@
                         <Font name="Lucida Sans Regular" size="16.0" />
                      </font>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#deleteElement" GridPane.columnIndex="6">
-                     <graphic>
-                        <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../image/delete.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <font>
-                        <Font name="Lucida Sans Regular" size="16.0" />
-                     </font>
-                  </Button>
-                  <Button mnemonicParsing="false" onAction="#editElement" GridPane.columnIndex="7">
+                  <Button mnemonicParsing="false" onAction="#editElement" GridPane.columnIndex="6">
                      <graphic>
                         <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../../image/edit.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <font>
-                        <Font name="Lucida Sans Regular" size="16.0" />
-                     </font>
-                  </Button>
-                  <Button mnemonicParsing="false" onAction="#addElement" GridPane.columnIndex="8">
-                     <graphic>
-                        <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../image/new.png" />
                            </image>
                         </ImageView>
                      </graphic>

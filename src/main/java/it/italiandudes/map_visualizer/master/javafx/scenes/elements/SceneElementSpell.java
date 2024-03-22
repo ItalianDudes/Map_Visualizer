@@ -1,6 +1,7 @@
 package it.italiandudes.map_visualizer.master.javafx.scenes.elements;
 
 import it.italiandudes.idl.common.Logger;
+import it.italiandudes.map_visualizer.master.javafx.components.Waypoint;
 import it.italiandudes.map_visualizer.master.javafx.utils.JFXDefs;
 import it.italiandudes.map_visualizer.master.javafx.components.SceneController;
 import it.italiandudes.map_visualizer.master.javafx.controllers.elements.ControllerSceneElementSpell;
@@ -10,7 +11,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -19,13 +19,13 @@ public final class SceneElementSpell {
 
     // Scene Generator
     @NotNull
-    public static SceneController getScene(@Nullable final String spellName) throws SQLException {
+    public static SceneController getScene(@NotNull final Waypoint waypoint) {
         try {
             FXMLLoader loader = new FXMLLoader(Defs.Resources.get(JFXDefs.Resources.FXML.Elements.FXML_ELEMENT_SPELL));
             Parent root = loader.load();
             ThemeHandler.loadConfigTheme(root);
             ControllerSceneElementSpell controller = loader.getController();
-            if (spellName != null) controller.setSpell(spellName);
+            controller.setWaypoint(waypoint);
             controller.configurationComplete();
             return new SceneController(root, controller);
         } catch (IOException e) {
@@ -35,13 +35,13 @@ public final class SceneElementSpell {
         }
     }
     @NotNull
-    public static SceneController getScene(@NotNull final JSONObject spellStructure) {
+    public static SceneController getScene(@Nullable final String spellName) throws SQLException {
         try {
             FXMLLoader loader = new FXMLLoader(Defs.Resources.get(JFXDefs.Resources.FXML.Elements.FXML_ELEMENT_SPELL));
             Parent root = loader.load();
             ThemeHandler.loadConfigTheme(root);
             ControllerSceneElementSpell controller = loader.getController();
-            controller.setSpellStructure(spellStructure);
+            if (spellName != null) controller.setSpell(spellName);
             controller.configurationComplete();
             return new SceneController(root, controller);
         } catch (IOException e) {

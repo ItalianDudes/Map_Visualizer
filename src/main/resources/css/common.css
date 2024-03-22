@@ -23,3 +23,22 @@
 .tab-root {
     -fx-padding: 5px 5px 5px 5px;
 }
+
+.waypoint-icon {
+    -fx-border-width: 2px;
+    -fx-border-radius: 4px;
+    -fx-border-color: black;
+    -fx-min-width: 32px;
+    -fx-min-height: 32px;
+    -fx-pref-width: 32px;
+    -fx-pref-height: 32px;
+    -fx-max-width: 32px;
+    -fx-max-height: 32px;
+}
+
+.waypoint {
+    -fx-padding: 5px;
+    -fx-border-width: 2px;
+    -fx-border-color: black;
+    -fx-border-radius: 4px;
+}

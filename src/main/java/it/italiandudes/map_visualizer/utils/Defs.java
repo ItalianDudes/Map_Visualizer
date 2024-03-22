@@ -20,6 +20,9 @@ public final class Defs {
     // DB Versions
     public static final String DB_VERSION = "1.0";
 
+    // Map Square Side
+    public static final double MAP_SQUARE_SIDE = 1.5; // 1.5 metri
+
     // Jar App Position
     public static final String JAR_POSITION;
     static {
@@ -68,11 +71,32 @@ public final class Defs {
         // SVG
         public static final class SVG {
             private static final String SVG_DIR = "/svg/";
-            public static final String SVG_ADDON = SVG_DIR + "addon.svg";
-            public static final String SVG_ARMOR = SVG_DIR + "armor.svg";
-            public static final String SVG_ITEM = SVG_DIR + "item.svg";
-            public static final String SVG_SPELL = SVG_DIR + "spell.svg";
-            public static final String SVG_WEAPON = SVG_DIR + "weapon.svg";
+            public static final class Elements {
+                private static final String ELEMENTS_DIR = SVG_DIR + "elements/";
+                public static final String ELEMENT_ADDON = ELEMENTS_DIR + "addon.svg";
+                public static final String ELEMENT_ARMOR = ELEMENTS_DIR + "armor.svg";
+                public static final String ELEMENT_ITEM = ELEMENTS_DIR + "item.svg";
+                public static final String ELEMENT_SPELL = ELEMENTS_DIR + "spell.svg";
+                public static final String ELEMENT_WEAPON = ELEMENTS_DIR + "weapon.svg";
+            }
+            public static final class Entities {
+                private static final String ENTITIES_DIR = SVG_DIR + "entities/";
+                public static final String ENTITY_PLAYER = ENTITIES_DIR + "player.svg";
+                public static final String ENTITY_NPC = ENTITIES_DIR + "npc.svg";
+                public static final String ENTITY_ENEMY = ENTITIES_DIR + "enemy.svg";
+                public static final String ENTITY_STRONG_ENEMY = ENTITIES_DIR + "strong_enemy.svg";
+                public static final String ENTITY_BOSS = ENTITIES_DIR + "boss.svg";
+            }
+            public static final class Objectives {
+                private static final String OBJECTIVES_DIR = SVG_DIR + "objectives/";
+                public static final String OBJECTIVE_MISSION = OBJECTIVES_DIR + "mission.svg";
+            }
+            public static final class PointsOfInterest {
+                private static final String POI_DIR = SVG_DIR + "points_of_interest/";
+                public static final String POI_MARKET = POI_DIR + "market.svg";
+                public static final String POI_TAVERN = POI_DIR + "tavern.svg";
+                public static final String POI_OFFICE = POI_DIR + "office.svg";
+            }
         }
 
         // Images

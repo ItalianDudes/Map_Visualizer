@@ -3,13 +3,12 @@ package it.italiandudes.map_visualizer.data.elements;
 import it.italiandudes.idl.common.Logger;
 import it.italiandudes.map_visualizer.master.interfaces.ISavable;
 import it.italiandudes.map_visualizer.master.javafx.alerts.ErrorAlert;
+import it.italiandudes.map_visualizer.master.javafx.components.Waypoint;
 import it.italiandudes.map_visualizer.master.utils.DBManager;
 import it.italiandudes.map_visualizer.data.enums.Category;
 import it.italiandudes.map_visualizer.data.enums.EquipmentType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -30,8 +29,8 @@ public class Equipment extends Item implements ISavable {
     private boolean isEquipped = false;
 
     // Constructors
-    public Equipment(@NotNull final EquipmentType type) {
-        super(Category.EQUIPMENT);
+    public Equipment(@NotNull final EquipmentType type, @NotNull final Waypoint waypoint) {
+        super(Category.EQUIPMENT, waypoint);
         this.type = type;
     }
     public Equipment(@NotNull Item item, @NotNull final EquipmentType type, final int lifeEffect, final double lifePercentageEffect,
@@ -70,44 +69,6 @@ public class Equipment extends Item implements ISavable {
         } else {
             ps.close();
             throw new SQLException("Exist the item, but not the equipment");
-        }
-    }
-    public Equipment(@NotNull final JSONObject equipmentStructure) throws JSONException {
-        super(equipmentStructure);
-        try {
-            this.type = EquipmentType.values()[equipmentStructure.getInt("type")];
-        } catch (ArrayIndexOutOfBoundsException | JSONException e) {
-            throw new JSONException("Parameter equipment type must be a non-null integer in bounds.");
-        }
-        try {
-            this.lifeEffect = equipmentStructure.getInt("lifeEffect");
-        } catch (JSONException e) {
-            this.lifeEffect = 0;
-        }
-        try {
-            this.lifePercentageEffect = equipmentStructure.getDouble("lifePercentageEffect");
-        } catch (JSONException e) {
-            this.lifePercentageEffect = 0;
-        }
-        try {
-            this.caEffect = equipmentStructure.getInt("caEffect");
-        } catch (JSONException e) {
-            this.caEffect = 0;
-        }
-        try {
-            this.loadEffect = equipmentStructure.getInt("loadEffect");
-        } catch (JSONException e) {
-            this.loadEffect = 0;
-        }
-        try {
-            this.loadPercentageEffect = equipmentStructure.getDouble("loadPercentageEffect");
-        } catch (JSONException e) {
-            this.loadPercentageEffect = 0;
-        }
-        try {
-            this.otherEffects = equipmentStructure.getString("otherEffects");
-        } catch (JSONException e) {
-            this.otherEffects = null;
         }
     }
 

@@ -26,8 +26,8 @@ public final class ControllerSceneMapSheet {
     // Initialize
     @FXML
     private void initialize() {
-        SceneController map = SceneTabMap.getScene();
-        SceneController elements = SceneTabElements.getScene();
+        SceneController map = SceneTabMap.getScene(this);
+        SceneController elements = SceneTabElements.getScene(this);
         SceneController settings = SceneTabSettings.getScene();
         controllerTabMap = (ControllerSceneTabMap) map.getController();
         controllerTabElements = (ControllerSceneTabElements) elements.getController();

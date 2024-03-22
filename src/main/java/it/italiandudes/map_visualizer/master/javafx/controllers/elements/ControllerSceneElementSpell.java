@@ -3,6 +3,7 @@ package it.italiandudes.map_visualizer.master.javafx.controllers.elements;
 import it.italiandudes.idl.common.ImageHandler;
 import it.italiandudes.idl.common.Logger;
 import it.italiandudes.map_visualizer.master.javafx.Client;
+import it.italiandudes.map_visualizer.master.javafx.components.Waypoint;
 import it.italiandudes.map_visualizer.master.javafx.utils.JFXDefs;
 import it.italiandudes.map_visualizer.master.javafx.alerts.ConfirmationAlert;
 import it.italiandudes.map_visualizer.master.javafx.alerts.ErrorAlert;
@@ -34,7 +35,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -50,15 +50,16 @@ public final class ControllerSceneElementSpell {
     // Attributes
     private volatile boolean configurationComplete = false;
     private Spell spell = null;
-    private JSONObject spellStructure = null;
+    private Waypoint waypoint = null;
     private String imageExtension = null;
 
     // Methods
     public void setSpell(@NotNull final String spellName) throws SQLException {
         this.spell = new Spell(spellName);
+        this.waypoint = spell.getWaypoint();
     }
-    public void setSpellStructure(@NotNull final JSONObject spellStructure) {
-        this.spellStructure = spellStructure;
+    public void setWaypoint(@NotNull final Waypoint waypoint) {
+        this.waypoint = waypoint;
     }
     public void configurationComplete() {
         configurationComplete = true;
@@ -128,7 +129,6 @@ public final class ControllerSceneElementSpell {
                         //noinspection StatementWithEmptyBody
                         while (!configurationComplete);
                         if (spell != null) initExistingSpell();
-                        else if (spellStructure != null) initExistingSpell(spellStructure);
                         return null;
                     }
                 };
@@ -270,7 +270,8 @@ public final class ControllerSceneElementSpell {
                                         comboBoxRarity.getSelectionModel().getSelectedItem(),
                                         Category.SPELL,
                                         0,
-                                        1
+                                        1,
+                                        waypoint
                                 );
                                 spell = new Spell(
                                         item,
@@ -298,7 +299,8 @@ public final class ControllerSceneElementSpell {
                                         comboBoxRarity.getSelectionModel().getSelectedItem(),
                                         Category.SPELL,
                                         0,
-                                        1
+                                        1,
+                                        waypoint
                                 );
                                 spell = new Spell(
                                         item,
@@ -312,6 +314,7 @@ public final class ControllerSceneElementSpell {
                                 );
                             }
 
+                            waypoint.setName(textFieldName.getText());
                             spell.saveIntoDatabase(oldName);
                             Platform.runLater(() -> new InformationAlert("SUCCESSO", "Aggiornamento Dati", "Aggiornamento dei dati effettuato con successo!"));
                         } catch (Exception e) {
@@ -409,7 +412,8 @@ public final class ControllerSceneElementSpell {
                                     comboBoxRarity.getSelectionModel().getSelectedItem(),
                                     Category.SPELL,
                                     0,
-                                    1
+                                    1,
+                                    waypoint
                             );
                             Spell exportableSpell = new Spell(
                                     item,
@@ -448,70 +452,6 @@ public final class ControllerSceneElementSpell {
     }
 
     // Methods
-    private void initExistingSpell(@NotNull final JSONObject spellStructure) {
-        try {
-            Spell tempSpell = new Spell(spellStructure);
-
-            imageExtension = tempSpell.getImageExtension();
-            int CC = tempSpell.getCostCopper();
-            int CP = CC / 1000;
-            CC -= CP * 1000;
-            int CG = CC / 100;
-            CC -= CG * 100;
-            int CE = CC / 50;
-            CC -= CE * 50;
-            int CS = CC / 10;
-            CC -= CS * 10;
-
-            BufferedImage bufferedImage = null;
-            try {
-                if (tempSpell.getBase64image() != null && imageExtension != null) {
-                    byte[] imageBytes = Base64.getDecoder().decode(tempSpell.getBase64image());
-                    ByteArrayInputStream imageStream = new ByteArrayInputStream(imageBytes);
-                    bufferedImage = ImageIO.read(imageStream);
-                } else if (tempSpell.getBase64image() != null && imageExtension == null) {
-                    throw new IllegalArgumentException("Image without declared extension");
-                }
-            } catch (IllegalArgumentException e) {
-                Logger.log(e);
-                tempSpell.setBase64image(null);
-                tempSpell.setImageExtension(null);
-                Platform.runLater(() -> new ErrorAlert("ERRORE", "Errore di lettura", "L'immagine ricevuta dal database non è leggibile"));
-                return;
-            }
-
-            int finalCC = CC;
-            BufferedImage finalBufferedImage = bufferedImage;
-
-            Platform.runLater(() -> {
-                textFieldName.setText(tempSpell.getName());
-                comboBoxRarity.getSelectionModel().select(tempSpell.getRarity().getTextedRarity());
-                textFieldMR.setText(String.valueOf(finalCC));
-                textFieldMA.setText(String.valueOf(CS));
-                textFieldME.setText(String.valueOf(CE));
-                textFieldMO.setText(String.valueOf(CG));
-                textFieldMP.setText(String.valueOf(CP));
-                textAreaDescription.setText(tempSpell.getDescription());
-                if (finalBufferedImage != null && imageExtension != null) {
-                    imageViewItem.setImage(SwingFXUtils.toFXImage(finalBufferedImage, null));
-                } else {
-                    imageViewItem.setImage(JFXDefs.AppInfo.LOGO);
-                }
-                textFieldLevel.setText(String.valueOf(tempSpell.getLevel()));
-                textFieldType.setText(tempSpell.getType());
-                textFieldCastTime.setText(tempSpell.getCastTime());
-                textFieldSpellRange.setText(tempSpell.getRange());
-                textFieldComponents.setText(tempSpell.getComponents());
-                textFieldDuration.setText(tempSpell.getDuration());
-            });
-        } catch (Exception e) {
-            Logger.log(e);
-            Platform.runLater(() -> {
-                new ErrorAlert("ERRORE", "Errore di Importazione", "La struttura dei dati non e' valida.");
-                textFieldName.getScene().getWindow().hide();
-            });
-        }
-    }
     private void initExistingSpell() {
         try {
             imageExtension = spell.getImageExtension();

@@ -3,6 +3,7 @@ package it.italiandudes.map_visualizer.master.javafx.controllers.elements;
 import it.italiandudes.idl.common.ImageHandler;
 import it.italiandudes.idl.common.Logger;
 import it.italiandudes.map_visualizer.master.javafx.Client;
+import it.italiandudes.map_visualizer.master.javafx.components.Waypoint;
 import it.italiandudes.map_visualizer.master.javafx.utils.JFXDefs;
 import it.italiandudes.map_visualizer.master.javafx.alerts.ConfirmationAlert;
 import it.italiandudes.map_visualizer.master.javafx.alerts.ErrorAlert;
@@ -34,7 +35,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -49,15 +49,16 @@ public final class ControllerSceneElementArmor {
     // Attributes
     private volatile boolean configurationComplete = false;
     private Armor armor = null;
-    private JSONObject armorStructure = null;
+    private Waypoint waypoint = null;
     private String imageExtension = null;
 
     // Methods
     public void setArmor(@NotNull final String armorName) throws SQLException {
         this.armor = new Armor(armorName);
+        this.waypoint = armor.getWaypoint();
     }
-    public void setArmorStructure(@NotNull final JSONObject armorStructure) {
-        this.armorStructure = armorStructure;
+    public void setWaypoint(@NotNull final Waypoint waypoint) {
+        this.waypoint = waypoint;
     }
     public void configurationComplete() {
         configurationComplete = true;
@@ -143,7 +144,6 @@ public final class ControllerSceneElementArmor {
                         //noinspection StatementWithEmptyBody
                         while (!configurationComplete);
                         if (armor != null) initExistingArmor();
-                        else if (armorStructure != null) initExistingArmor(armorStructure);
                         return null;
                     }
                 };
@@ -325,7 +325,8 @@ public final class ControllerSceneElementArmor {
                                     comboBoxRarity.getSelectionModel().getSelectedItem(),
                                     Category.EQUIPMENT,
                                     weight,
-                                    spinnerQuantity.getValue()
+                                    spinnerQuantity.getValue(),
+                                    waypoint
                             );
                             Armor exportableArmor = new Armor(
                                     item,
@@ -470,7 +471,8 @@ public final class ControllerSceneElementArmor {
                                         comboBoxRarity.getSelectionModel().getSelectedItem(),
                                         Category.EQUIPMENT,
                                         weight,
-                                        spinnerQuantity.getValue()
+                                        spinnerQuantity.getValue(),
+                                        waypoint
                                 );
                                 armor = new Armor(
                                         item,
@@ -496,7 +498,8 @@ public final class ControllerSceneElementArmor {
                                         comboBoxRarity.getSelectionModel().getSelectedItem(),
                                         Category.EQUIPMENT,
                                         weight,
-                                        spinnerQuantity.getValue()
+                                        spinnerQuantity.getValue(),
+                                        waypoint
                                 );
                                 armor = new Armor(
                                         item,
@@ -508,6 +511,7 @@ public final class ControllerSceneElementArmor {
                                 );
                             }
 
+                            waypoint.setName(textFieldName.getText());
                             armor.saveIntoDatabase(oldName);
                             Platform.runLater(() -> new InformationAlert("SUCCESSO", "Salvataggio dei Dati", "Salvataggio dei dati completato con successo!"));
                         } catch (Exception e) {
@@ -524,73 +528,6 @@ public final class ControllerSceneElementArmor {
         }.start();
     }
     // Methods
-    private void initExistingArmor(@NotNull final JSONObject armorStructure) {
-        try {
-            Armor tempArmor = new Armor(armorStructure);
-            imageExtension = tempArmor.getImageExtension();
-            int CC = tempArmor.getCostCopper();
-            int CP = CC / 1000;
-            CC -= CP * 1000;
-            int CG = CC / 100;
-            CC -= CG * 100;
-            int CE = CC / 50;
-            CC -= CE * 50;
-            int CS = CC / 10;
-            CC -= CS * 10;
-
-            BufferedImage bufferedImage = null;
-            try {
-                if (tempArmor.getBase64image() != null && imageExtension != null) {
-                    byte[] imageBytes = Base64.getDecoder().decode(tempArmor.getBase64image());
-                    ByteArrayInputStream imageStream = new ByteArrayInputStream(imageBytes);
-                    bufferedImage = ImageIO.read(imageStream);
-                } else if (tempArmor.getBase64image() != null && imageExtension == null) {
-                    throw new IllegalArgumentException("Image without declared extension");
-                }
-            } catch (IllegalArgumentException e) {
-                Logger.log(e);
-                tempArmor.setBase64image(null);
-                tempArmor.setImageExtension(null);
-                Platform.runLater(() -> new ErrorAlert("ERRORE", "Errore di lettura", "L'immagine ricevuta dal database non è leggibile"));
-                return;
-            }
-
-            int finalCC = CC;
-            BufferedImage finalBufferedImage = bufferedImage;
-
-            Platform.runLater(() -> {
-                textFieldName.setText(tempArmor.getName());
-                textFieldWeight.setText(String.valueOf(tempArmor.getWeight()));
-                comboBoxRarity.getSelectionModel().select(tempArmor.getRarity().getTextedRarity());
-                textFieldMR.setText(String.valueOf(finalCC));
-                textFieldMA.setText(String.valueOf(CS));
-                textFieldME.setText(String.valueOf(CE));
-                textFieldMO.setText(String.valueOf(CG));
-                textFieldMP.setText(String.valueOf(CP));
-                textAreaDescription.setText(tempArmor.getDescription());
-                if (finalBufferedImage != null && imageExtension != null) {
-                    imageViewItem.setImage(SwingFXUtils.toFXImage(finalBufferedImage, null));
-                } else {
-                    imageViewItem.setImage(JFXDefs.AppInfo.LOGO);
-                }
-                spinnerQuantity.getValueFactory().setValue(tempArmor.getQuantity());
-                comboBoxSlot.getSelectionModel().select(tempArmor.getSlot());
-                textFieldEffectCA.setText(String.valueOf(tempArmor.getCaEffect()));
-                textFieldEffectLife.setText(String.valueOf(tempArmor.getLifeEffect()));
-                textFieldEffectLifePerc.setText(String.valueOf(tempArmor.getLifePercentageEffect()));
-                textFieldEffectLoad.setText(String.valueOf(tempArmor.getLoadEffect()));
-                textFieldEffectLoadPerc.setText(String.valueOf(tempArmor.getLoadPercentageEffect()));
-                textAreaOtherEffects.setText(tempArmor.getOtherEffects());
-                comboBoxWeightCategory.getSelectionModel().select(tempArmor.getWeightCategory());
-            });
-        } catch (Exception e) {
-            Logger.log(e);
-            Platform.runLater(() -> {
-                new ErrorAlert("ERRORE", "Errore di Importazione", "La struttura dei dati non e' valida.");
-                textFieldName.getScene().getWindow().hide();
-            });
-        }
-    }
     private void initExistingArmor() {
         try {
             imageExtension = armor.getImageExtension();

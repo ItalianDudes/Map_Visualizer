@@ -3,6 +3,7 @@ package it.italiandudes.map_visualizer.master.javafx.controllers.elements;
 import it.italiandudes.idl.common.ImageHandler;
 import it.italiandudes.idl.common.Logger;
 import it.italiandudes.map_visualizer.master.javafx.Client;
+import it.italiandudes.map_visualizer.master.javafx.components.Waypoint;
 import it.italiandudes.map_visualizer.master.javafx.utils.JFXDefs;
 import it.italiandudes.map_visualizer.master.javafx.alerts.ConfirmationAlert;
 import it.italiandudes.map_visualizer.master.javafx.alerts.ErrorAlert;
@@ -32,7 +33,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -47,15 +47,16 @@ public final class ControllerSceneElementWeapon {
     // Attributes
     private volatile boolean configurationComplete = false;
     private Weapon weapon = null;
-    private JSONObject weaponStructure = null;
+    private Waypoint waypoint = null;
     private String imageExtension = null;
 
     // Methods
     public void setWeapon(@NotNull final String weaponName) throws SQLException {
         this.weapon = new Weapon(weaponName);
+        this.waypoint = weapon.getWaypoint();
     }
-    public void setWeaponStructure(@NotNull final JSONObject weaponStructure) {
-        this.weaponStructure = weaponStructure;
+    public void setWaypoint(@NotNull final Waypoint waypoint) {
+        this.waypoint = waypoint;
     }
     public void configurationComplete() {
         configurationComplete = true;
@@ -139,7 +140,6 @@ public final class ControllerSceneElementWeapon {
                         //noinspection StatementWithEmptyBody
                         while (!configurationComplete);
                         if (weapon != null) initExistingWeapon();
-                        else if (weaponStructure != null) initExistingWeapon(weaponStructure);
                         return null;
                     }
                 };
@@ -336,7 +336,8 @@ public final class ControllerSceneElementWeapon {
                                         comboBoxRarity.getSelectionModel().getSelectedItem(),
                                         Category.EQUIPMENT,
                                         weight,
-                                        spinnerQuantity.getValue()
+                                        spinnerQuantity.getValue(),
+                                        waypoint
                                 );
                                 weapon = new Weapon(
                                         item, weaponCategory, properties, lifeEffect, lifeEffectPerc,
@@ -360,7 +361,8 @@ public final class ControllerSceneElementWeapon {
                                         comboBoxRarity.getSelectionModel().getSelectedItem(),
                                         Category.EQUIPMENT,
                                         weight,
-                                        spinnerQuantity.getValue()
+                                        spinnerQuantity.getValue(),
+                                        waypoint
                                 );
                                 weapon = new Weapon(
                                         item, weapon.getEquipmentID(), weapon.getWeaponID(),
@@ -368,6 +370,8 @@ public final class ControllerSceneElementWeapon {
                                         loadEffect, loadEffectPerc, caEffect, otherEffects, isEquipped
                                 );
                             }
+
+                            waypoint.setName(textFieldName.getText());
                             weapon.saveIntoDatabase(oldName);
                             Platform.runLater(() -> new InformationAlert("SUCCESSO", "Salvataggio dei Dati", "Salvataggio dei dati completato con successo!"));
                         } catch (Exception e) {
@@ -493,7 +497,8 @@ public final class ControllerSceneElementWeapon {
                                     comboBoxRarity.getSelectionModel().getSelectedItem(),
                                     Category.EQUIPMENT,
                                     weight,
-                                    spinnerQuantity.getValue()
+                                    spinnerQuantity.getValue(),
+                                    waypoint
                             );
                             Weapon exportableWeapon = new Weapon(
                                     item, weaponCategory, properties, lifeEffect, lifeEffectPerc,
@@ -526,74 +531,6 @@ public final class ControllerSceneElementWeapon {
     }
 
     // Methods
-    private void initExistingWeapon(@NotNull final JSONObject weaponStructure) {
-        try {
-            Weapon tempWeapon = new Weapon(weaponStructure);
-
-            imageExtension = tempWeapon.getImageExtension();
-            int CC = tempWeapon.getCostCopper();
-            int CP = CC / 1000;
-            CC -= CP * 1000;
-            int CG = CC / 100;
-            CC -= CG * 100;
-            int CE = CC / 50;
-            CC -= CE * 50;
-            int CS = CC / 10;
-            CC -= CS * 10;
-
-            BufferedImage bufferedImage = null;
-            try {
-                if (tempWeapon.getBase64image() != null && imageExtension != null) {
-                    byte[] imageBytes = Base64.getDecoder().decode(tempWeapon.getBase64image());
-                    ByteArrayInputStream imageStream = new ByteArrayInputStream(imageBytes);
-                    bufferedImage = ImageIO.read(imageStream);
-                } else if (tempWeapon.getBase64image() != null && imageExtension == null) {
-                    throw new IllegalArgumentException("Image without declared extension");
-                }
-            } catch (IllegalArgumentException e) {
-                Logger.log(e);
-                tempWeapon.setBase64image(null);
-                tempWeapon.setImageExtension(null);
-                Platform.runLater(() -> new ErrorAlert("ERRORE", "Errore di lettura", "L'immagine ricevuta dal database non è leggibile"));
-                return;
-            }
-
-            int finalCC = CC;
-            BufferedImage finalBufferedImage = bufferedImage;
-
-            Platform.runLater(() -> {
-                textFieldName.setText(tempWeapon.getName());
-                textFieldWeight.setText(String.valueOf(tempWeapon.getWeight()));
-                comboBoxRarity.getSelectionModel().select(tempWeapon.getRarity().getTextedRarity());
-                textFieldMR.setText(String.valueOf(finalCC));
-                textFieldMA.setText(String.valueOf(CS));
-                textFieldME.setText(String.valueOf(CE));
-                textFieldMO.setText(String.valueOf(CG));
-                textFieldMP.setText(String.valueOf(CP));
-                textAreaDescription.setText(tempWeapon.getDescription());
-                if (finalBufferedImage != null && imageExtension != null) {
-                    imageViewItem.setImage(SwingFXUtils.toFXImage(finalBufferedImage, null));
-                } else {
-                    imageViewItem.setImage(JFXDefs.AppInfo.LOGO);
-                }
-                spinnerQuantity.getValueFactory().setValue(tempWeapon.getQuantity());
-                textFieldEffectCA.setText(String.valueOf(tempWeapon.getCaEffect()));
-                textFieldEffectLife.setText(String.valueOf(tempWeapon.getLifeEffect()));
-                textFieldEffectLifePerc.setText(String.valueOf(tempWeapon.getLifePercentageEffect()));
-                textFieldEffectLoad.setText(String.valueOf(tempWeapon.getLoadEffect()));
-                textFieldEffectLoadPerc.setText(String.valueOf(tempWeapon.getLoadPercentageEffect()));
-                textAreaOtherEffects.setText(tempWeapon.getOtherEffects());
-                textAreaProperties.setText(tempWeapon.getProperties());
-                textFieldWeaponCategory.setText(tempWeapon.getWeaponCategory());
-            });
-        } catch (Exception e) {
-            Logger.log(e);
-            Platform.runLater(() -> {
-                new ErrorAlert("ERRORE", "Errore di Importazione", "La struttura dei dati non e' valida.");
-                textFieldName.getScene().getWindow().hide();
-            });
-        }
-    }
     private void initExistingWeapon() {
         try {
             imageExtension = weapon.getImageExtension();

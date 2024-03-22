@@ -3,6 +3,7 @@ package it.italiandudes.map_visualizer.master.javafx.controllers.elements;
 import it.italiandudes.idl.common.ImageHandler;
 import it.italiandudes.idl.common.Logger;
 import it.italiandudes.map_visualizer.master.javafx.Client;
+import it.italiandudes.map_visualizer.master.javafx.components.Waypoint;
 import it.italiandudes.map_visualizer.master.javafx.utils.JFXDefs;
 import it.italiandudes.map_visualizer.master.javafx.alerts.ConfirmationAlert;
 import it.italiandudes.map_visualizer.master.javafx.alerts.ErrorAlert;
@@ -31,7 +32,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -46,15 +46,16 @@ public class ControllerSceneElementItem {
     // Attributes
     private volatile boolean configurationComplete = false;
     private Item item = null;
-    private JSONObject itemStructure = null;
+    private Waypoint waypoint = null;
     private String imageExtension = null;
 
     // Methods
     public void setItem(@NotNull final String itemName) throws SQLException {
         this.item = new Item(itemName);
+        this.waypoint = item.getWaypoint();
     }
-    public void setItemStructure(@NotNull final JSONObject itemStructure) {
-        this.itemStructure = itemStructure;
+    public void setWaypoint(@NotNull final Waypoint waypoint) {
+        this.waypoint = waypoint;
     }
     public void configurationComplete() {
         configurationComplete = true;
@@ -128,7 +129,6 @@ public class ControllerSceneElementItem {
                         //noinspection StatementWithEmptyBody
                         while (!configurationComplete);
                         if (item != null) initExistingItem();
-                        else if (itemStructure != null) initExistingItem(itemStructure);
                         return null;
                     }
                 };
@@ -295,7 +295,8 @@ public class ControllerSceneElementItem {
                                         comboBoxRarity.getSelectionModel().getSelectedItem(),
                                         Category.ITEM,
                                         weight,
-                                        spinnerQuantity.getValue()
+                                        spinnerQuantity.getValue(),
+                                        waypoint
                                 );
                             } else {
                                 oldName = item.getName();
@@ -313,10 +314,12 @@ public class ControllerSceneElementItem {
                                         comboBoxRarity.getSelectionModel().getSelectedItem(),
                                         Category.ITEM,
                                         weight,
-                                        spinnerQuantity.getValue()
+                                        spinnerQuantity.getValue(),
+                                        waypoint
                                 );
                             }
 
+                            waypoint.setName(textFieldName.getText());
                             item.saveIntoDatabase(oldName);
                             Platform.runLater(() -> new InformationAlert("SUCCESSO", "Salvataggio dei Dati", "Salvataggio dei dati completato con successo!"));
                         } catch (Exception e) {
@@ -412,7 +415,8 @@ public class ControllerSceneElementItem {
                                     comboBoxRarity.getSelectionModel().getSelectedItem(),
                                     Category.ITEM,
                                     weight,
-                                    spinnerQuantity.getValue()
+                                    spinnerQuantity.getValue(),
+                                    waypoint
                             );
 
                             String itemCode = exportableItem.exportElement();
@@ -441,68 +445,6 @@ public class ControllerSceneElementItem {
     }
 
     // Methods
-    private void initExistingItem(@NotNull final JSONObject itemStructure) {
-        try {
-            Item tempItem = new Item(itemStructure);
-
-            imageExtension = tempItem.getImageExtension();
-            int CC = tempItem.getCostCopper();
-            int CP = CC / 1000;
-            CC -= CP * 1000;
-            int CG = CC / 100;
-            CC -= CG * 100;
-            int CE = CC / 50;
-            CC -= CE * 50;
-            int CS = CC / 10;
-            CC -= CS * 10;
-
-            BufferedImage bufferedImage = null;
-            try {
-                if (tempItem.getBase64image() != null && imageExtension != null) {
-                    byte[] imageBytes = Base64.getDecoder().decode(tempItem.getBase64image());
-                    ByteArrayInputStream imageStream = new ByteArrayInputStream(imageBytes);
-                    bufferedImage = ImageIO.read(imageStream);
-                } else if (tempItem.getBase64image() != null && imageExtension == null) {
-                    throw new IllegalArgumentException("Image without declared extension");
-                }
-            } catch (IllegalArgumentException e) {
-                Logger.log(e);
-                tempItem.setBase64image(null);
-                tempItem.setImageExtension(null);
-                Platform.runLater(() -> new ErrorAlert("ERRORE", "Errore di lettura", "L'immagine ricevuta dal database non è leggibile"));
-                return;
-            }
-
-            int finalCC = CC;
-            BufferedImage finalBufferedImage = bufferedImage;
-
-            Platform.runLater(() -> {
-
-                textFieldName.setText(tempItem.getName());
-                textFieldWeight.setText(String.valueOf(tempItem.getWeight()));
-                comboBoxRarity.getSelectionModel().select(tempItem.getRarity().getTextedRarity());
-                textFieldMR.setText(String.valueOf(finalCC));
-                textFieldMA.setText(String.valueOf(CS));
-                textFieldME.setText(String.valueOf(CE));
-                textFieldMO.setText(String.valueOf(CG));
-                textFieldMP.setText(String.valueOf(CP));
-                textAreaDescription.setText(tempItem.getDescription());
-                if (finalBufferedImage != null && imageExtension != null) {
-                    imageViewItem.setImage(SwingFXUtils.toFXImage(finalBufferedImage, null));
-                } else {
-                    imageViewItem.setImage(JFXDefs.AppInfo.LOGO);
-                }
-                spinnerQuantity.getValueFactory().setValue(tempItem.getQuantity());
-            });
-
-        } catch (Exception e) {
-            Logger.log(e);
-            Platform.runLater(() -> {
-                new ErrorAlert("ERRORE", "Errore di Importazione", "La struttura dei dati non e' valida.");
-                textFieldName.getScene().getWindow().hide();
-            });
-        }
-    }
     private void initExistingItem() {
         try {
             imageExtension = item.getImageExtension();

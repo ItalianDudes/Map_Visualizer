@@ -1,6 +1,7 @@
 package it.italiandudes.map_visualizer.data.elements;
 
 import it.italiandudes.map_visualizer.master.interfaces.ISavable;
+import it.italiandudes.map_visualizer.master.javafx.components.Waypoint;
 import it.italiandudes.map_visualizer.master.utils.DBManager;
 import it.italiandudes.map_visualizer.data.enums.EquipmentType;
 import it.italiandudes.map_visualizer.data.enums.Rarity;
@@ -8,7 +9,6 @@ import it.italiandudes.map_visualizer.data.enums.SerializerType;
 import it.italiandudes.map_visualizer.utils.Defs;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
@@ -26,8 +26,8 @@ public final class Weapon extends Equipment implements ISavable {
     @Nullable private String properties;
 
     // Constructors
-    public Weapon() {
-        super(EquipmentType.WEAPON);
+    public Weapon(@NotNull final Waypoint waypoint) {
+        super(EquipmentType.WEAPON, waypoint);
     }
     public Weapon(@NotNull final Item item, final int equipmentID, final int weaponID, @Nullable final String weaponCategory,
                   @Nullable final String properties, final int lifeEffect, final double lifeEffectPerc, final int loadEffect,
@@ -61,19 +61,6 @@ public final class Weapon extends Equipment implements ISavable {
         } else {
             ps.close();
             throw new SQLException("Exist the equipment, but not the weapon");
-        }
-    }
-    public Weapon(@NotNull final JSONObject weaponStructure) throws JSONException {
-        super(weaponStructure);
-        try {
-            this.weaponCategory = weaponStructure.getString("weaponCategory");
-        } catch (JSONException e) {
-            this.weaponCategory = null;
-        }
-        try {
-            this.properties = weaponStructure.getString("properties");
-        } catch (JSONException e) {
-            this.properties = null;
         }
     }
 

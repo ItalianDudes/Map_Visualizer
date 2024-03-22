@@ -1,16 +1,21 @@
 package it.italiandudes.map_visualizer.master.javafx.controllers.tabs;
 
 import it.italiandudes.idl.common.Logger;
+import it.italiandudes.map_visualizer.data.enums.WaypointType;
 import it.italiandudes.map_visualizer.master.javafx.Client;
 import it.italiandudes.map_visualizer.master.javafx.alerts.ErrorAlert;
 import it.italiandudes.map_visualizer.master.javafx.components.TextFieldMenuItem;
-import it.italiandudes.map_visualizer.master.javafx.components.waypoints.Waypoint;
+import it.italiandudes.map_visualizer.master.javafx.components.Waypoint;
+import it.italiandudes.map_visualizer.master.javafx.controllers.ControllerSceneMapSheet;
 import it.italiandudes.map_visualizer.master.javafx.scenes.elements.*;
-import it.italiandudes.map_visualizer.utils.Defs;
+import it.italiandudes.map_visualizer.master.utils.DBManager;
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.control.*;
@@ -19,9 +24,24 @@ import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@SuppressWarnings({"DuplicatedCode", "ExtractMethodRecommender"})
 public final class ControllerSceneTabMap {
+
+    // Attributes
+    private ControllerSceneMapSheet controllerSceneMapSheet;
+    private volatile boolean configurationComplete = false;
+
+    // Methods
+    public void setControllerSceneMapSheet(@NotNull final ControllerSceneMapSheet controllerSceneMapSheet) {
+        this.controllerSceneMapSheet = controllerSceneMapSheet;
+    }
+    public void configurationComplete() {
+        configurationComplete = true;
+    }
 
     // Attributes
     private final BooleanProperty wPressed = new SimpleBooleanProperty();
@@ -86,7 +106,35 @@ public final class ControllerSceneTabMap {
         imageViewMap.scaleYProperty().addListener((observable, oldValue, newValue) -> anchorPaneWaypointLayer.setScaleY(newValue.doubleValue()));
         imageViewMap.fitWidthProperty().addListener((observable, oldValue, newValue) -> anchorPaneWaypointLayer.setPrefWidth(newValue.doubleValue()));
         imageViewMap.fitHeightProperty().addListener((observable, oldValue, newValue) -> anchorPaneWaypointLayer.setPrefHeight(newValue.doubleValue()));
-        // fetchWaypointsFromDB();
+        fetchWaypointsFromDB();
+    }
+
+    // Waypoint Fetcher
+    public void fetchWaypointsFromDB() {
+        anchorPaneWaypointLayer.getChildren().clear();
+        new Service<Void>() {
+            @Override
+            protected Task<Void> createTask() {
+                return new Task<Void>() {
+                    @Override
+                    protected Void call() {
+                        String query = "SELECT * FROM waypoints;";
+                        try (PreparedStatement ps = DBManager.preparedStatement(query)) {
+                            if (ps == null) throw new SQLException("Prepared statement is null");
+                            ResultSet result = ps.executeQuery();
+                            while (result.next()) {
+                                Waypoint waypoint = new Waypoint(result.getString("name"), WaypointType.values()[result.getInt("type")], new Point2D(result.getDouble("center_x"), result.getDouble("center_y")));
+                                Platform.runLater(() -> anchorPaneWaypointLayer.getChildren().add(waypoint));
+                                configureElementWaypointContextMenu(waypoint);
+                            }
+                        } catch (SQLException e) {
+                            DBManager.showDatabaseErrorMessageAndBackToMenu(e);
+                        }
+                        return null;
+                    }
+                };
+            }
+        }.start();
     }
 
     // EDT
@@ -110,74 +158,66 @@ public final class ControllerSceneTabMap {
         Menu elementMenu = new Menu("Aggiungi Elemento");
         MenuItem addItem = new MenuItem("Nuovo Oggetto");
         addItem.setOnAction(ev -> {
-            try {
-                Client.initPopupStage(SceneElementItem.getScene((String) null).getParent()).showAndWait();
-            } catch (SQLException ex) {
-                Logger.log(ex);
-                new ErrorAlert("ERRORE", "Errore di Database", "Si e' verificato un'errore durante la comunicazione con il database");
-            }
+            Waypoint waypoint = new Waypoint(WaypointType.ELEMENT_ITEM, pos);
+            Client.initPopupStage(SceneElementItem.getScene(waypoint).getParent()).showAndWait();
+            if (waypoint.getName().replace("\t", "").replace(" ", "").isEmpty()) return;
+            anchorPaneWaypointLayer.getChildren().add(waypoint);
+            configureElementWaypointContextMenu(waypoint);
+            controllerSceneMapSheet.getControllerTabElements().search();
         });
         Menu equipmentMenu = new Menu("Nuovo Equipaggiamento");
         MenuItem addArmor = new MenuItem("Nuova Armatura");
         addArmor.setOnAction(ev -> {
-            try {
-                Client.initPopupStage(SceneElementArmor.getScene((String) null).getParent()).showAndWait();
-            } catch (SQLException ex) {
-                Logger.log(ex);
-                new ErrorAlert("ERRORE", "Errore di Database", "Si e' verificato un'errore durante la comunicazione con il database");
-            }
+            Waypoint waypoint = new Waypoint(WaypointType.ELEMENT_ARMOR, pos);
+            Client.initPopupStage(SceneElementArmor.getScene(waypoint).getParent()).showAndWait();
+            if (waypoint.getName().replace("\t", "").replace(" ", "").isEmpty()) return;
+            anchorPaneWaypointLayer.getChildren().add(waypoint);
+            configureElementWaypointContextMenu(waypoint);
+            controllerSceneMapSheet.getControllerTabElements().search();
         });
         MenuItem addAddon = new MenuItem("Nuovo Addon");
         addAddon.setOnAction(ev -> {
-            try {
-                Client.initPopupStage(SceneElementAddon.getScene((String) null).getParent()).showAndWait();
-            } catch (SQLException ex) {
-                Logger.log(ex);
-                new ErrorAlert("ERRORE", "Errore di Database", "Si e' verificato un'errore durante la comunicazione con il database");
-            }
+            Waypoint waypoint = new Waypoint(WaypointType.ELEMENT_ADDON, pos);
+            Client.initPopupStage(SceneElementAddon.getScene(waypoint).getParent()).showAndWait();
+            if (waypoint.getName().replace("\t", "").replace(" ", "").isEmpty()) return;
+            anchorPaneWaypointLayer.getChildren().add(waypoint);
+            configureElementWaypointContextMenu(waypoint);
+            controllerSceneMapSheet.getControllerTabElements().search();
         });
         MenuItem addWeapon = new MenuItem("Nuova Arma");
         addWeapon.setOnAction(ev -> {
-            /*
-            try {
-                Client.initPopupStage(SceneElementWeapon.getScene((String) null).getParent()).showAndWait();
-            } catch (SQLException ex) {
-                Logger.log(ex);
-                new ErrorAlert("ERRORE", "Errore di Database", "Si e' verificato un'errore durante la comunicazione con il database");
-            }*/
-            Waypoint waypoint = new Waypoint("Test", Defs.Resources.SVG.SVG_WEAPON, pos);
+            Waypoint waypoint = new Waypoint(WaypointType.ELEMENT_WEAPON, pos);
+            Client.initPopupStage(SceneElementWeapon.getScene(waypoint).getParent()).showAndWait();
+            if (waypoint.getName().replace("\t", "").replace(" ", "").isEmpty()) return;
             anchorPaneWaypointLayer.getChildren().add(waypoint);
-            configureWaypointContenxtMenu(waypoint);
+            configureElementWaypointContextMenu(waypoint);
+            controllerSceneMapSheet.getControllerTabElements().search();
         });
         equipmentMenu.getItems().addAll(addArmor, addAddon, addWeapon);
         MenuItem addSpell = new MenuItem("Nuovo Incantesimo");
         addSpell.setOnAction(ev -> {
-            try {
-                Client.initPopupStage(SceneElementSpell.getScene((String) null).getParent()).showAndWait();
-            } catch (SQLException ex) {
-                Logger.log(ex);
-                new ErrorAlert("ERRORE", "Errore di Database", "Si e' verificato un'errore durante la comunicazione con il database");
-            }
+            Waypoint waypoint = new Waypoint(WaypointType.ELEMENT_SPELL, pos);
+            Client.initPopupStage(SceneElementSpell.getScene(waypoint).getParent()).showAndWait();
+            if (waypoint.getName().replace("\t", "").replace(" ", "").isEmpty()) return;
+            anchorPaneWaypointLayer.getChildren().add(waypoint);
+            configureElementWaypointContextMenu(waypoint);
+            controllerSceneMapSheet.getControllerTabElements().search();
         });
         elementMenu.getItems().addAll(addItem, equipmentMenu, addSpell);
 
         // Entities
         Menu entityMenu = new Menu("Aggiungi Entita'");
-        MenuItem addPlayer = new TextFieldMenuItem("Nuovo Giocatore", "Nome Giocatore");
-        MenuItem addNPC = new MenuItem("Nuovo NPC");
-        MenuItem addEnemy = new MenuItem("Nuovo Nemico");
-        Menu armyMenu = new Menu("Nuovo Esercito");
-        MenuItem addAllyArmy = new MenuItem("Nuovo Esercito Alleato");
-        MenuItem addEnemyArmy = new MenuItem("Nuovo Esercito Nemico");
-        armyMenu.getItems().addAll(addAllyArmy, addEnemyArmy);
-        entityMenu.getItems().addAll(addPlayer, addNPC, addEnemy, armyMenu);
+        TextFieldMenuItem addPlayer = new TextFieldMenuItem("Nuovo Giocatore", "Nome Giocatore");
+        TextFieldMenuItem addNPC = new TextFieldMenuItem("Nuovo NPC", "Nome NPC");
+        TextFieldMenuItem addEnemy = new TextFieldMenuItem("Nuovo Nemico", "Nome Nemico");
+        TextFieldMenuItem addStrongEnemy = new TextFieldMenuItem("Nuovo Nemico Potente", "Nome Nemico Potente");
+        TextFieldMenuItem addBoss = new TextFieldMenuItem("Nuovo Boss", "Nome Boss");
+        entityMenu.getItems().addAll(addPlayer, addNPC, addEnemy, addStrongEnemy, addBoss);
 
         // Objectives
         Menu objectiveMenu = new Menu("Aggiungi Obiettivo");
-        MenuItem addMainMission = new TextFieldMenuItem("Nuova Missione Principale", "Nome Missione");
-        MenuItem addSecondaryMission = new TextFieldMenuItem("Nuova Missione Secondaria", "Nome Missione");
-        MenuItem addNPCInteraction = new TextFieldMenuItem("Nuova Interazione NPC", "Nome NPC");
-        objectiveMenu.getItems().addAll(addMainMission, addSecondaryMission, addNPCInteraction);
+        MenuItem addMission = new TextFieldMenuItem("Nuova Missione", "Nome Missione");
+        objectiveMenu.getItems().addAll(addMission);
 
         // Points of Interest
         Menu pointsOfInterestMenu = new Menu("Aggiungi Punto di Interesse");
@@ -233,21 +273,46 @@ public final class ControllerSceneTabMap {
     }
 
     // Waypoint Methods
-    private void configureWaypointContenxtMenu(@NotNull Waypoint waypoint) {
+    private void configureElementWaypointContextMenu(@NotNull Waypoint waypoint) {
         waypoint.hoverProperty().addListener((observable, oldValue, newValue) -> {
+            waypoint.setZoom(newValue);
             if (newValue) {
-                waypoint.setScaleX(2);
-                waypoint.setScaleY(2);
                 labelWaypointName.setText(waypoint.getName());
                 labelWaypointName.setVisible(true);
             } else {
-                waypoint.setScaleX(1);
-                waypoint.setScaleY(1);
                 labelWaypointName.setText("");
                 labelWaypointName.setVisible(false);
             }
         });
         waypoint.setOnScroll(ControllerSceneTabMap.this::mapZoom);
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem editWaypoint = new MenuItem("Modifica");
+        editWaypoint.setOnAction(ev -> controllerSceneMapSheet.getControllerTabElements().editElement(waypoint));
+        MenuItem deleteWaypoint = new MenuItem("Elimina");
+        deleteWaypoint.setOnAction(ev -> new Service<Void>() {
+                @Override
+                protected Task<Void> createTask() {
+                    return new Task<Void>() {
+                        @Override
+                        protected Void call() {
+                            String query = "DELETE FROM waypoints WHERE id=?;";
+                            assert waypoint.getWaypointID() != null;
+                            try (PreparedStatement ps = DBManager.preparedStatement(query)) {
+                                if (ps == null) throw new SQLException("Prepared statement is null");
+                                ps.setInt(1, waypoint.getWaypointID());
+                                ps.executeUpdate();
+                                Platform.runLater(() -> anchorPaneWaypointLayer.getChildren().remove(waypoint));
+                            } catch (SQLException e) {
+                                DBManager.showDatabaseErrorMessageAndBackToMenu(e);
+                            }
+                            return null;
+                        }
+                    };
+                }
+            }.start());
+        contextMenu.getItems().addAll(editWaypoint, deleteWaypoint);
+        contextMenu.setAutoHide(true);
+        waypoint.setOnContextMenuRequested(e -> contextMenu.show(Client.getStage(), e.getScreenX(), e.getScreenY()));
     }
 
     // Methods

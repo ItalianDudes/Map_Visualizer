@@ -4,6 +4,15 @@ CREATE TABLE IF NOT EXISTS key_parameters (
     param_value TEXT
 );
 
+CREATE TABLE IF NOT EXISTS waypoints (
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    type INTEGER NOT NULL,
+    center_x REAL NOT NULL,
+    center_y REAL NOT NULL,
+    UNIQUE(name, type)
+);
+
 CREATE TABLE IF NOT EXISTS items (
     id INTEGER NOT NULL PRIMARY KEY,
     base64image TEXT,
@@ -14,7 +23,10 @@ CREATE TABLE IF NOT EXISTS items (
     rarity INTEGER NOT NULL DEFAULT 0,
     weight REAL NOT NULL DEFAULT 0,
     category INTEGER NOT NULL DEFAULT 0,
-    quantity INTEGER NOT NULL DEFAULT 0
+    quantity INTEGER NOT NULL DEFAULT 0,
+    waypoint_id INTEGER NOT NULL REFERENCES waypoints(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS spells (
